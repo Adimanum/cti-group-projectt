@@ -1,69 +1,84 @@
-# Dataset — Tycoon2FA IOCs
+# CTI Group Project: Tycoon2FA AiTM Phishing-as-a-Service
 
-![Dataset overview](../images/dataset_overview.png)
+**Course:** Introduction to Threat Hunting, Astana IT University, 2026–2027  
+**Group:** CS-2426  
+**Members:** Dilnaz Estaikyzy, Ademi Akmaganbet
 
-## Contents
+## About the project
 
-| File | Description |
-|---|---|
-| `raw/esentire_tycoon2fa_2025-03-27.txt` | Raw public IOC list from eSentire TRU (phishing URLs, "check" URLs, ASN) |
-| `raw/esentire_tycoon2fa_2025-04-10.txt` | Raw public IOC list from eSentire TRU ("check" URLs) |
-| `raw/esentire_tycoon2fa_2026-03-23.txt` | Raw public IOC list from eSentire TRU (login egress IPs + "check" URLs) |
-| `tycoon2fa_iocs.csv` | **Main dataset**: normalized, deduplicated and defanged (produced by `scripts/normalize_iocs.py`) |
-| `misp_event_tycoon2fa.json` | The same indicators as a MISP event, refanged and ready to import |
+This project studies how a modern **Phishing-as-a-Service (PhaaS)** platform works and how it can be detected, using threat intelligence methods. Our case study is **Tycoon2FA**, an *Adversary-in-the-Middle (AiTM)* phishing kit that has been active since August 2023. Microsoft attributes it to Storm-1747.
 
-Source of the raw data: eSentire Threat Response Unit, public IOC repository
-<https://github.com/eSentire/iocs/tree/main/Tycoon2FA>. We only collected these files. We did not produce the indicators ourselves.
-The kit-level patterns (JS/CSS names, Unicode obfuscation, WebSocket relay) come from the Week 2 OSINT sources (Sekoia, Trustwave, Microsoft).
+Tycoon2FA is rented to other criminals as a ready-made service. It places a reverse proxy between the victim and the real Microsoft 365 or Google login page, and steals passwords, MFA codes and session cookies in real time. This allows attackers to bypass most common MFA methods. The kit hides from analysts with obfuscated JavaScript (including invisible Unicode characters), CAPTCHA filtering and anti-debugging code.
 
-## Processing steps (Week 3: filtering and normalization)
+We follow the course's weekly structure. Each week adds one step of the threat intelligence cycle to the same case:
 
-1. **Parse**: read each raw file section by section (URLs, IP table, ASN list).
-2. **Clean**: trim whitespace, refang `[.]` → `.`, convert hostnames to lower case, drop malformed IP rows.
-3. **Enrich**: extract the *hostname* and the *registered domain* from every URL. Keep the ASN and User-Agent for every IP.
-4. **Deduplicate**: merge indicators that appear in several reports. For each one, keep the first and last report date and the number of reports.
-5. **Classify**: assign a MISP type, category and `to_ids` flag. Descriptive `text` and `AS` attributes are not used for detection.
-6. **Export**: write a defanged CSV (safe to publish) and a refanged MISP JSON (for import into MISP only).
+1. Build the theory base: glossary and threat classification.
+2. Collect OSINT data about the kit and its infrastructure.
+3. Process the data: build an IOC dataset, then filter and normalize it, store it in MISP, and write a detection rule.
+4. Later weeks: map the attack to the Cyber Kill Chain and MITRE ATT&CK, build hunting hypotheses, and emulate the attack.
 
-Run it again with:
+## Weekly progress
 
-```bash
-python3 scripts/normalize_iocs.py   # rebuilds CSV + MISP JSON
-python3 scripts/plot_dataset.py     # rebuilds images/dataset_overview.png
+| Week | Syllabus topic | Task (syllabus §3.3) | Deliverable |
+|---|---|---|---|
+| 1 | Cyber Threat Intelligence Fundamentals | Glossary of CTI terms; classify threats and their sources | [`week1_glossary_classification_en.md`](week1_glossary_classification_en.md) |
+| 2 | Data Collection Process | OSINT collection with Shodan, VirusTotal and Maltego; data source mapping | [`week2_osint_collection_en.md`](week2_osint_collection_en.md) |
+| 3 | Data Processing and Exploitation | Deploy MISP and import IOCs; apply filtering and normalization | [`week3_misp_iocs_en.md`](week3_misp_iocs_en.md), [`dataset/`](dataset/) |
+
+## Dataset
+
+The dataset is in [`dataset/`](dataset/). Its README describes every column.
+
+![Dataset overview](dataset/dataset_overview.png)
+
+- **Raw data:** `dataset/esentire_*.txt`, three public Tycoon2FA IOC lists published by eSentire TRU (2025–2026).
+- **Processed data:** `dataset/tycoon2fa_iocs.csv` has **667 unique, defanged indicators**: 229 URLs, 225 hostnames, 131 registered domains, 76 login egress IPs, plus kit artifacts from vendor reports.
+- **MISP import:** `dataset/misp_event_tycoon2fa.json`.
+
+## Repository structure
+
+```
+.
+├── README.md                              # this file
+├── week1_glossary_classification_en.md    # Week 1 report
+├── week2_osint_collection_en.md           # Week 2 report
+├── week3_misp_iocs_en.md                  # Week 3 report
+└── dataset/                               # Week 3 data
+    ├── README.md                          # data dictionary and processing steps
+    ├── tycoon2fa_iocs.csv                 # THE DATASET (normalized IOCs)
+    ├── misp_event_tycoon2fa.json          # the same IOCs for MISP import
+    ├── esentire_tycoon2fa_*.txt           # raw source files (eSentire TRU)
+    ├── normalize_iocs.py                  # filtering / normalization script
+    ├── plot_dataset.py                    # chart script
+    └── dataset_overview.png               # chart
 ```
 
-## Result in numbers
+To reproduce the results (Python 3, plus matplotlib for the chart):
 
-| Metric | Value |
-|---|---|
-| Raw records parsed | 377 |
-| Duplicate raw rows merged | 71 |
-| Unique indicators in the dataset | 667 |
-| URLs / hostnames / registered domains | 229 / 225 / 131 |
-| Egress IP addresses (IPv4 + IPv6) | 76 |
-| Indicators seen in more than one report | 168 |
-| Top TLD | `.ru` (96 of 131 domains) |
-| Top egress hosting provider | M247 Europe SRL (46 of 76 IPs) |
+```bash
+python3 dataset/normalize_iocs.py
+python3 dataset/plot_dataset.py
+```
 
-## Column description (`tycoon2fa_iocs.csv`)
+## Use of AI tools
 
-| Column | Meaning |
-|---|---|
-| `id` | Row number |
-| `misp_type` | MISP attribute type (`url`, `hostname`, `domain`, `ip-src`, `AS`, `filename`, `filename-pattern`, `text`) |
-| `category` | MISP category |
-| `value_defanged` | Indicator value, defanged (`[.]`, `hxxps[://]`) so it cannot be clicked |
-| `to_ids` | `True` if the indicator should be used for detection (IDS/SIEM) |
-| `comment` | Context: role of the URL, ASN and User-Agent of the IP, and so on |
-| `first_seen_report` / `last_seen_report` | Earliest and latest report date in which the indicator appears |
-| `report_count` | Number of raw reports that contain the indicator |
-| `sources` | Raw file names (or vendor report) the indicator came from |
+In line with the course policy on generative AI, we disclose that we used an AI assistant (Claude, Anthropic) in this project for:
 
-## Importing into MISP
+- **Formulating the data:** wording the glossary definitions, the threat classification and the descriptions of the collected indicators and dataset columns.
+- **Preparing the report:** structuring the Markdown documents, improving the English text, and help with the helper scripts for processing the dataset.
 
-**Event Actions → Import from… → MISP JSON** → upload `misp_event_tycoon2fa.json`.
-The event is tagged `tlp:clear`, `type:OSINT` and with ATT&CK techniques T1566.002, T1557 and T1539.
+The AI was not used as a source of facts. All technical information comes from the references listed below. The group checked it against those sources and is responsible for the final content. The topic choice, the OSINT collection, the MISP work and the conclusions are our own work.
 
-## Safety note
+## References
 
-All values are defanged in the CSV. The egress IPs belong to VPS/hosting providers and are short-lived. Use them for hunting historical sign-in logs, not for permanent blocking. Do not open the URLs outside an isolated sandbox.
+1. Sekoia TDR, "Tycoon 2FA: an in-depth analysis of the latest version of the AiTM phishing kit", March 2024. <https://blog.sekoia.io/tycoon-2fa-an-in-depth-analysis-of-the-latest-version-of-the-aitm-phishing-kit/>
+2. Microsoft Threat Intelligence, "Inside Tycoon2FA: How a leading AiTM phishing kit operated at scale", Microsoft Security Blog, March 2026. <https://www.microsoft.com/en-us/security/blog/2026/03/04/inside-tycoon2fa-how-a-leading-aitm-phishing-kit-operated-at-scale/>
+3. Trustwave SpiderLabs, "Tycoon2FA New Evasion Technique for 2025", April 2025. <https://trustwave.com/en-us/resources/blogs/spiderlabs-blog/tycoon2fa-new-evasion-technique-for-2025>
+4. eSentire TRU, "Tycoon 2FA Operators Adopt OAuth Device Code Phishing", May 2026. <https://www.esentire.com/blog/tycoon-2fa-operators-adopt-oauth-device-code-phishing>
+5. eSentire TRU, public IOC repository, Tycoon2FA (dataset source). <https://github.com/eSentire/iocs/tree/main/Tycoon2FA>
+6. Elastic Security Labs, "Detecting Tycoon 2FA AiTM attacks across Entra ID and Google Workspace", May 2026. <https://www.elastic.co/security-labs/tycoon-2fa-aitm-detection-engineering>
+7. MITRE ATT&CK: T1566.002 Spearphishing Link, T1557 Adversary-in-the-Middle, T1539 Steal Web Session Cookie. <https://attack.mitre.org/>
+8. MISP Project, MISP Training Materials and User Guide. <https://www.misp-project.org/documentation/>
+9. ENISA, ENISA Threat Landscape (recommended reading, Week 1). <https://www.enisa.europa.eu/topics/cyber-threats/threat-landscape>
+10. M. Bazzell, *Open Source Intelligence Techniques* (recommended reading, Week 2).
+11. Recorded Future, *The Threat Intelligence Handbook* (Week 1 lecture source).
