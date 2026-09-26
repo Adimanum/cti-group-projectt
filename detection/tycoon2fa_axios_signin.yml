@@ -1,0 +1,41 @@
+title: Tycoon2FA AiTM Session Replay - Sign-in With Axios User-Agent
+id: 6f1d2c4e-9b1a-4c55-8e0e-2a7f3b9d1c01
+status: experimental
+description: |
+  Detects successful Entra ID (Azure AD) sign-ins where the client User-Agent is the
+  Node.js HTTP library "axios". eSentire TRU (March 2026) observed Tycoon2FA login
+  infrastructure authenticating with stolen session material using User-Agent
+  axios/1.13.x against the same application ID. A real user's browser never sends
+  an axios User-Agent, so a successful sign-in with it is highly suspicious.
+references:
+  - https://github.com/eSentire/iocs/tree/main/Tycoon2FA
+  - https://www.esentire.com/blog/tycoon-2fa-operators-adopt-oauth-device-code-phishing
+  - https://www.elastic.co/security-labs/tycoon-2fa-aitm-detection-engineering
+author: CS-2426 group project (Dilnaz Estaikyzy, Ademi Akmaganbet)
+date: 2026-09-26
+tags:
+  - attack.credential-access
+  - attack.t1557
+  - attack.t1539
+  - attack.defense-evasion
+  - attack.t1550.004
+logsource:
+  product: azure
+  service: signinlogs
+  # field names follow the Microsoft Sentinel "SigninLogs" table
+detection:
+  selection_ua:
+    UserAgent|startswith: 'axios/'
+  selection_success:
+    ResultType: '0'
+  condition: selection_ua and selection_success
+fields:
+  - TimeGenerated
+  - UserPrincipalName
+  - IPAddress
+  - UserAgent
+  - AppId
+  - AutonomousSystemNumber
+falsepositives:
+  - Internal scripts or integrations that authenticate interactively with axios (should be rare - service principals normally use client credentials, not user sign-ins)
+level: high

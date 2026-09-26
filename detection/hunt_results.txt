@@ -1,0 +1,23 @@
+# Hunt: Tycoon2FA AiTM Session Replay - Sign-in With Axios User-Agent
+# Sigma rule : tycoon2fa_axios_signin.yml  (level: high)
+# IOC list   : 76 Tycoon2FA egress IPs from dataset/tycoon2fa_iocs.csv
+# Events     : 8 synthetic sign-ins from sample_signin_logs.jsonl
+
+time                 user                     ip                          user-agent        result  SIGMA  IOC  VERDICT
+2026-03-20T08:14:02Z a.user@contoso.example   142.252.171.135             axios/1.13.6      0       hit    hit  ALERT - high confidence (behaviour + known IOC)
+2026-03-20T08:15:40Z b.user@contoso.example   2a0d:5600:8:94::f2cd:9d43   axios/1.13.2      0       hit    hit  ALERT - high confidence (behaviour + known IOC)
+2026-03-20T09:02:11Z c.user@contoso.example   203.0.113.50                axios/1.12.0      0       hit    -    ALERT - behaviour only (new infrastructure?)
+2026-03-20T09:30:55Z d.user@contoso.example   170.168.215.64              Mozilla/5.0 (Win  0       -      hit  REVIEW - known IOC IP, but browser UA / not axios
+2026-03-20T10:01:00Z e.user@contoso.example   198.51.100.23               axios/1.13.6      50126   -      -    info - failed axios attempt (no session issued)
+2026-03-20T10:12:31Z f.user@contoso.example   198.51.100.77               Mozilla/5.0 (Mac  0       -      -    clean
+2026-03-20T11:45:09Z g.user@contoso.example   192.0.2.10                  Microsoft Office  0       -      -    clean
+2026-03-20T12:03:44Z h.user@contoso.example   192.0.2.44                  Mozilla/5.0 (X11  0       -      -    clean
+
+# Summary
+#   behaviour + IOC      : 2
+#   behaviour only       : 1
+#   IOC only             : 1
+#   no alert             : 4
+# Conclusion: the Sigma rule also catches sign-ins from infrastructure that is NOT yet
+# in the IOC list (IP-based blocking alone would miss them), while IOC matching adds
+# confidence and finds cases where the attacker switched to a browser User-Agent.
