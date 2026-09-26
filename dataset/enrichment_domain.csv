@@ -1,0 +1,7 @@
+domain,rdap_registrar,created,expires,last_changed,nameservers,assessment,collected_utc
+fesxtmc.com,Domain Science Kutatasi Szolgaltato Kft.,2026-09-11,2027-09-11,2026-09-13,ns1/ns2.dns-redirect.com,Re-registered after the March 2026 report; now parked - stale indicator,2026-09-26
+shoupeatai.com,"Sav.com, LLC",2026-03-04,2027-03-04,2026-03-05,millie/rodrigo.ns.cloudflare.com,Registered ~3 weeks before report; Cloudflare DNS - typical throw-away phishing domain,2026-09-26
+shailoyio.com,"Sav.com, LLC",2026-03-05,2027-03-05,2026-03-08,dane/kiki.ns.cloudflare.com,Registered ~3 weeks before report; same registrar as shoupeatai.com,2026-09-26
+sistaidru.com,GMO Internet (Onamae.com),2026-02-12,2027-02-12,2026-02-13,fiona/hank.ns.cloudflare.com,Registered ~6 weeks before report; Cloudflare DNS,2026-09-26
+yljdimage.com,Gname.com Pte. Ltd.,2025-11-06,2026-11-06,2026-03-02,ivan/sasha.ns.cloudflare.com,Registered 2025; updated days before report,2026-09-26
+alnaharegypt.com,"Name.com, Inc.",2009-12-23,2026-12-23,2025-12-25,carter/lady.ns.cloudflare.com,Registered 2009 - likely compromised legitimate site; false-positive risk if blocked,2026-09-26

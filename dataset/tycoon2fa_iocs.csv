@@ -6,7 +6,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 5,domain,Network activity,aldfphv[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 6,domain,Network activity,aldiwe[.]ru,True,Registered domain behind phishing hostnames,2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
 7,domain,Network activity,aleonanob[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
-8,domain,Network activity,alnaharegypt[.]com,True,Registered domain behind phishing hostnames,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+8,domain,Network activity,alnaharegypt[.]com,False,FILTERED: domain registered in 2009 - likely a compromised legitimate site; blocking it would cause false positives,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 9,domain,Network activity,auoranest[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 10,domain,Network activity,biijvi[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 11,domain,Network activity,bkjuy[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
@@ -25,7 +25,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 24,domain,Network activity,drogdordr[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 25,domain,Network activity,enoqeg[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 26,domain,Network activity,eqgegucq[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
-27,domain,Network activity,fesxtmc[.]com,True,Registered domain behind phishing hostnames,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+27,domain,Network activity,fesxtmc[.]com,False,FILTERED: stale - domain was re-registered on 2026-09-11 and is now parked,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 28,domain,Network activity,fgaiuin[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 29,domain,Network activity,freshmnind[.]ru,True,Registered domain behind phishing hostnames,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 30,domain,Network activity,fukbaf[.]ru,True,Registered domain behind phishing hostnames,2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
@@ -240,7 +240,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 239,hostname,Network activity,i1e7[.]uishkfyv[.]ru,True,Phishing hostname,2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
 240,hostname,Network activity,i1ivp9[.]kdyukk[.]ru,True,Phishing hostname,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 241,hostname,Network activity,i57bn[.]lqeofyxipv[.]ru,True,Phishing hostname,2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
-242,hostname,Network activity,international[.]fesxtmc[.]com,True,Phishing hostname,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+242,hostname,Network activity,international[.]fesxtmc[.]com,False,FILTERED: stale - domain was re-registered on 2026-09-11 and is now parked,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 243,hostname,Network activity,ionic[.]tehipio[.]ink,True,Phishing hostname,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 244,hostname,Network activity,iw5ir[.]aezeib[.]ru,True,Phishing hostname,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 245,hostname,Network activity,j1m6g0[.]ajcffp[.]ru,True,Phishing hostname,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
@@ -345,7 +345,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 344,hostname,Network activity,wa[.]auoranest[.]ru,True,Phishing hostname,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 345,hostname,Network activity,wjgx[.]jaamzjd[.]ru,True,Phishing hostname,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 346,hostname,Network activity,wul[.]ulxmrerpi[.]ru,True,Phishing hostname,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
-347,hostname,Network activity,www[.]alnaharegypt[.]com,True,Phishing hostname,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+347,hostname,Network activity,www[.]alnaharegypt[.]com,False,FILTERED: domain registered in 2009 - likely a compromised legitimate site; blocking it would cause false positives,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 348,hostname,Network activity,xl[.]rknqkmex[.]ru,True,Phishing hostname,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 349,hostname,Network activity,xr6o[.]hqfyed[.]ru,True,Phishing hostname,2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
 350,hostname,Network activity,xue1y[.]kdyukk[.]ru,True,Phishing hostname,2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
@@ -547,7 +547,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 546,url,Network activity,hxxps[://]i1e7[.]uishkfyv[.]ru/chai$qfcd44ma,True,'check' URL (pre-landing redirect),2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
 547,url,Network activity,hxxps[://]i1ivp9[.]kdyukk[.]ru/chai!34aifoc,True,'check' URL (pre-landing redirect),2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 548,url,Network activity,hxxps[://]i57bn[.]lqeofyxipv[.]ru/tatay$3ifuqb,True,'check' URL (pre-landing redirect),2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
-549,url,Network activity,hxxps[://]international[.]fesxtmc[.]com/2zbyaS9u2sI@oYU3r0q2P9c4hLWH,True,'check' URL (pre-landing redirect),2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+549,url,Network activity,hxxps[://]international[.]fesxtmc[.]com/2zbyaS9u2sI@oYU3r0q2P9c4hLWH,False,'check' URL (pre-landing redirect); FILTERED: stale - domain was re-registered on 2026-09-11 and is now parked,2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 550,url,Network activity,hxxps[://]ionic[.]tehipio[.]ink/NAs7P9!D62Jri18pL,True,'check' URL (pre-landing redirect),2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 551,url,Network activity,hxxps[://]iw5ir[.]aezeib[.]ru/rand$e6t3o,True,'check' URL (pre-landing redirect),2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 552,url,Network activity,hxxps[://]j1m6g0[.]ajcffp[.]ru/kella!nbr51,True,'check' URL (pre-landing redirect),2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
@@ -652,7 +652,7 @@ id,misp_type,category,value_defanged,to_ids,comment,first_seen_report,last_seen_
 651,url,Network activity,hxxps[://]wa[.]auoranest[.]ru/LorC4gArX/,True,landing URL,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 652,url,Network activity,hxxps[://]wjgx[.]jaamzjd[.]ru/machlo!gdcrwj,True,'check' URL (pre-landing redirect),2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt
 653,url,Network activity,hxxps[://]wul[.]ulxmrerpi[.]ru/XfCgPt/,True,landing URL,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
-654,url,Network activity,hxxps[://]www[.]alnaharegypt[.]com/t~467369,True,'check' URL (pre-landing redirect),2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
+654,url,Network activity,hxxps[://]www[.]alnaharegypt[.]com/t~467369,True,"'check' URL (pre-landing redirect); compromised legitimate site - block this URL only, not the domain",2026-03-23,2026-03-23,1,esentire_tycoon2fa_2026-03-23.txt
 655,url,Network activity,hxxps[://]xl[.]rknqkmex[.]ru/cbWJFhxm/,True,landing URL,2025-03-27,2025-03-27,1,esentire_tycoon2fa_2025-03-27.txt
 656,url,Network activity,hxxps[://]xr6o[.]hqfyed[.]ru/machlo@qn6yj7,True,'check' URL (pre-landing redirect),2025-04-10,2025-04-10,1,esentire_tycoon2fa_2025-04-10.txt
 657,url,Network activity,hxxps[://]xue1y[.]kdyukk[.]ru/kabutar@iagsc3u,True,'check' URL (pre-landing redirect),2025-03-27,2025-04-10,2,esentire_tycoon2fa_2025-03-27.txt; esentire_tycoon2fa_2025-04-10.txt

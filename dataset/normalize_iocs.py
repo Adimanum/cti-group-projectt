@@ -50,6 +50,14 @@ KIT_PATTERNS = [
      "AiTM real-time relay behaviour", "Sekoia / Microsoft public reporting", False),
 ]
 
+# Filtering: indicators that must NOT be used for blocking (warninglist-style exclusions),
+# decided from the Week 2 RDAP enrichment (enrichment_domain.csv)
+EXCLUDE_FROM_IDS = {
+    "alnaharegypt.com": "FILTERED: domain registered in 2009 - likely a compromised legitimate site; "
+                        "blocking it would cause false positives",
+    "fesxtmc.com": "FILTERED: stale - domain was re-registered on 2026-09-11 and is now parked",
+}
+
 EVENT_TAGS = [
     "tlp:clear",
     'misp-galaxy:mitre-attack-pattern="Spearphishing Link - T1566.002"',
@@ -140,7 +148,16 @@ def main():
                                _srcs={src})
 
     for r in raw_records:
-        if r["kind"] == "url":
+        if r["kind"] == "url" and registered_domain(r["host"]) in EXCLUDE_FROM_IDS:
+            note = EXCLUDE_FROM_IDS[registered_domain(r["host"])]
+            # compromised legit site: the exact URL is still malicious, only the domain is excluded
+            url_ids = "compromised" in note
+            add("url", "Network activity", r["value"], url_ids,
+                f"{r['role']}; " + ("compromised legitimate site - block this URL only, not the domain"
+                                    if url_ids else note), r["date"], r["src"])
+            add("hostname", "Network activity", r["host"], False, note, r["date"], r["src"])
+            add("domain", "Network activity", registered_domain(r["host"]), False, note, r["date"], r["src"])
+        elif r["kind"] == "url":
             add("url", "Network activity", r["value"], True, r["role"], r["date"], r["src"])
             add("hostname", "Network activity", r["host"], True, "Phishing hostname", r["date"], r["src"])
             add("domain", "Network activity", registered_domain(r["host"]), True,
@@ -156,6 +173,16 @@ def main():
         add(mtype, cat, value, to_ids, comment, "2025-04" if "Trustwave" in src else "2024-03-25", src)
 
     rows = sorted(merged.values(), key=lambda r: (r["misp_type"], r["value"]))
+
+    # Detection content written in Week 3 is stored in the same MISP event
+    det = HERE.parent / "detection"
+    rule_attrs = []
+    for fname, mtype, comment in [("tycoon2fa.yar", "yara", "YARA rules (group-written, tested)"),
+                                  ("tycoon2fa_axios_signin.yml", "sigma", "Sigma rule for Entra ID sign-in logs")]:
+        if (det / fname).exists():
+            rule_attrs.append({"type": mtype, "category": "Payload installation",
+                               "value": (det / fname).read_text(encoding="utf-8"), "to_ids": False,
+                               "comment": comment})
 
     # ---- CSV (defanged, safe to publish on GitHub) ----
     with OUT_CSV.open("w", newline="", encoding="utf-8") as fh:
@@ -184,7 +211,7 @@ def main():
              "value": r["value"], "to_ids": r["to_ids"], "comment": r["comment"],
              "distribution": "5"}
             for r in rows
-        ],
+        ] + [dict(uuid=str(uuid.uuid4()), distribution="5", **a) for a in rule_attrs],
     }}
     OUT_MISP.write_text(json.dumps(event, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -198,6 +225,9 @@ def main():
         print(f"  {t:<17}{n}")
     multi = [r for r in rows if len(r["_srcs"]) > 1]
     print(f"Seen in >1 report  : {len(multi)}")
+    print(f"to_ids=True        : {sum(r['to_ids'] for r in rows)}  (filtered out: "
+          f"{sum(1 for r in rows if 'FILTERED' in r['comment'])})")
+    print(f"Detection rules added to MISP event: {len(rule_attrs)}")
 
 
 if __name__ == "__main__":
