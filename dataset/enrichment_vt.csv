@@ -1,0 +1,4 @@
+domain,vt_malicious_of_total,vt_verdicts,vt_tags,vt_creation,collected_utc
+shoupeatai.com,11/91,"ADMINUSLabs, Seclookup, Webroot: Malicious; alphaMountain.ai, BitDefender, Forcepoint, Fortinet, G-Data, Lionic, Sophos, VIPRE: Phishing; ESET: Suspicious","Spam (alphaMountain.ai); phishing and fraud; Phishing and Other Frauds",6 months ago,2026-09-26
+sistaidru.com,4/91,"alphaMountain.ai, Fortinet: Phishing; Chong Lua Dao, Webroot: Malicious",,7 months ago,2026-09-26
+alnaharegypt.com,0/91,"all vendors Clean; note: at least 2 detected files communicate with this domain",top-1M,17 years ago,2026-09-26

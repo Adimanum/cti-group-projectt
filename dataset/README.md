@@ -11,7 +11,9 @@
 | `esentire_tycoon2fa_2026-03-23.txt` | 2 | Raw public IOC list from eSentire TRU (login egress IPs + "check" URLs) |
 | `enrichment_ip.csv` | 2 | Shodan InternetDB + RIPEstat results for the 14 IPv4 egress IPs (2026-09-26) |
 | `enrichment_domain.csv` | 2 | RDAP registration data for the 6 `.com` domains, with our assessment (2026-09-26) |
-| `maltego_import.csv` | 2 | 34 entity links for Maltego (*Import Graph from Table*) |
+| `enrichment_vt.csv` | 2 | VirusTotal results for 3 domains (2026-09-26), screenshots `vt_*.png` |
+| `maltego_ips.csv` | 2 | Maltego table import: ASN → IP → open port |
+| `maltego_domains.csv` | 2 | Maltego table import: registrar → domain → name server |
 | `infra_graph.png` | 2 | Link graph: ASN → IP → Shodan fingerprint, registrar ← domain → DNS |
 | `osint_enrich.py` | 2 | Re-runs the Shodan / RIPEstat / RDAP queries (+ VirusTotal with `VT_API_KEY`) |
 | `plot_infra_graph.py` | 2 | Draws `infra_graph.png` |
