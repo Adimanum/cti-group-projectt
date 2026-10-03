@@ -1,8 +1,7 @@
 {
   "name": "Tycoon2FA - Kill Chain mapping (CS-2426)",
   "versions": {
-    "attack": "17",
-    "navigator": "5.1.0",
+    "navigator": "5.3.2",
     "layer": "4.5"
   },
   "domain": "enterprise-attack",

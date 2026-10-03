@@ -42,7 +42,7 @@ for st in data["stages"]:
         })
 layer = {
     "name": "Tycoon2FA - Kill Chain mapping (CS-2426)",
-    "versions": {"attack": "17", "navigator": "5.1.0", "layer": "4.5"},
+    "versions": {"navigator": "5.3.2", "layer": "4.5"},
     "domain": "enterprise-attack",
     "description": "Techniques observed in Tycoon2FA campaigns (Microsoft, Elastic, Sekoia, Trustwave, eSentire). "
                    "Green = covered by our Week 3 detections (IOCs, YARA, Sigma); red = observed but not yet covered.",
