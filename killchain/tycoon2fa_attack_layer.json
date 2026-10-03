@@ -1,0 +1,243 @@
+{
+  "name": "Tycoon2FA - Kill Chain mapping (CS-2426)",
+  "versions": {
+    "attack": "17",
+    "navigator": "5.1.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Techniques observed in Tycoon2FA campaigns (Microsoft, Elastic, Sekoia, Trustwave, eSentire). Green = covered by our Week 3 detections (IOCs, YARA, Sigma); red = observed but not yet covered.",
+  "techniques": [
+    {
+      "techniqueID": "T1589.002",
+      "tactic": "reconnaissance",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "1. Reconnaissance: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1588.002",
+      "tactic": "resource-development",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "2. Weaponization: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1583.001",
+      "tactic": "resource-development",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "2. Weaponization: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1608.005",
+      "tactic": "resource-development",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "2. Weaponization: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1566.001",
+      "tactic": "initial-access",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "3. Delivery: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1566.002",
+      "tactic": "initial-access",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "3. Delivery: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1204.001",
+      "tactic": "execution",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "4. Exploitation: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1204.002",
+      "tactic": "execution",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "4. Exploitation: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1027",
+      "tactic": "defense-evasion",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "4. Exploitation: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1497",
+      "tactic": "defense-evasion",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "4. Exploitation: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1656",
+      "tactic": "defense-evasion",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "4. Exploitation: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1098.005",
+      "tactic": "persistence",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "5. Installation: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1557",
+      "tactic": "credential-access",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "6. Command & Control: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1071.001",
+      "tactic": "command-and-control",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "6. Command & Control: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1567",
+      "tactic": "exfiltration",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "6. Command & Control: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1539",
+      "tactic": "credential-access",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "7. Actions on Objectives: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1550.004",
+      "tactic": "defense-evasion",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "7. Actions on Objectives: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1078.004",
+      "tactic": "initial-access",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "7. Actions on Objectives: covered by our detection",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1087.004",
+      "tactic": "discovery",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1564.008",
+      "tactic": "defense-evasion",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1114.002",
+      "tactic": "collection",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1534",
+      "tactic": "lateral-movement",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1657",
+      "tactic": "impact",
+      "score": 1,
+      "color": "#f4a3a3",
+      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "enabled": true,
+      "showSubtechniques": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#f4a3a3",
+      "#7fd17f"
+    ],
+    "minValue": 1,
+    "maxValue": 2
+  },
+  "legendItems": [
+    {
+      "label": "Observed, not covered",
+      "color": "#f4a3a3"
+    },
+    {
+      "label": "Covered by our detection",
+      "color": "#7fd17f"
+    }
+  ],
+  "hideDisabled": false,
+  "layout": {
+    "layout": "side",
+    "showName": true,
+    "showID": true
+  }
+}

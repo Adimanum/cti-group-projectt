@@ -1,0 +1,239 @@
+{
+  "case": "Tycoon2FA AiTM Phishing-as-a-Service",
+  "sources": {
+    "MS": "Microsoft Threat Intelligence, Inside Tycoon2FA (2026-03-04)",
+    "EL": "Elastic Security Labs, Detecting Tycoon 2FA AiTM attacks (2026-05)",
+    "SK": "Sekoia TDR, Tycoon 2FA in-depth analysis (2024-03)",
+    "TW": "Trustwave SpiderLabs, Tycoon2FA new evasion technique (2025-04)",
+    "ES": "eSentire TRU IOC repository + blog (2025-2026)",
+    "OUR": "Our own data and tests (Weeks 2-3)"
+  },
+  "stages": [
+    {
+      "stage": "1. Reconnaissance",
+      "tycoon2fa": "Customers of the kit collect target e-mail addresses; campaigns are broad and opportunistic (500,000+ organisations a month), not individually researched.",
+      "evidence": [
+        "MS"
+      ],
+      "techniques": [
+        {
+          "id": "T1589.002",
+          "name": "Gather Victim Identity Information: Email Addresses",
+          "tactic": "reconnaissance"
+        }
+      ],
+      "our_detection": []
+    },
+    {
+      "stage": "2. Weaponization",
+      "tycoon2fa": "Attacker rents the kit on Telegram/Signal ($120 for 10 days, $350 a month), registers short-lived domains behind Cloudflare and stages the obfuscated phishing page and lure templates (Microsoft 365, OneDrive, DocuSign).",
+      "evidence": [
+        "MS",
+        "OUR"
+      ],
+      "techniques": [
+        {
+          "id": "T1588.002",
+          "name": "Obtain Capabilities: Tool",
+          "tactic": "resource-development"
+        },
+        {
+          "id": "T1583.001",
+          "name": "Acquire Infrastructure: Domains",
+          "tactic": "resource-development"
+        },
+        {
+          "id": "T1608.005",
+          "name": "Stage Capabilities: Link Target",
+          "tactic": "resource-development"
+        }
+      ],
+      "our_detection": [
+        "131 phishing domains in dataset/tycoon2fa_iocs.csv",
+        "RDAP: domains registered 3-6 weeks before use, Cloudflare DNS (enrichment_domain.csv)"
+      ]
+    },
+    {
+      "stage": "3. Delivery",
+      "tycoon2fa": "Phishing e-mail with a link, a QR code in a PDF/DOCX, an SVG with redirect JavaScript or an HTML attachment; multi-hop redirect chain through Azure Blob, Firebase, Wix or Google resources to a 'check' URL.",
+      "evidence": [
+        "MS",
+        "EL",
+        "ES"
+      ],
+      "techniques": [
+        {
+          "id": "T1566.001",
+          "name": "Phishing: Spearphishing Attachment",
+          "tactic": "initial-access"
+        },
+        {
+          "id": "T1566.002",
+          "name": "Phishing: Spearphishing Link",
+          "tactic": "initial-access"
+        }
+      ],
+      "our_detection": [
+        "229 phishing / 'check' URLs for e-mail gateway & proxy blocking",
+        "YARA Tycoon2FA_Landing_Page_Artifacts can scan HTML attachments"
+      ]
+    },
+    {
+      "stage": "4. Exploitation",
+      "tycoon2fa": "The victim opens the link or attachment; a custom canvas CAPTCHA, bot/datacenter-IP filtering and anti-debugging hide the page from scanners; invisible-Unicode obfuscated JavaScript renders a pixel-perfect Microsoft login page.",
+      "evidence": [
+        "MS",
+        "TW",
+        "SK"
+      ],
+      "techniques": [
+        {
+          "id": "T1204.001",
+          "name": "User Execution: Malicious Link",
+          "tactic": "execution"
+        },
+        {
+          "id": "T1204.002",
+          "name": "User Execution: Malicious File",
+          "tactic": "execution"
+        },
+        {
+          "id": "T1027",
+          "name": "Obfuscated Files or Information",
+          "tactic": "defense-evasion"
+        },
+        {
+          "id": "T1497",
+          "name": "Virtualization/Sandbox Evasion",
+          "tactic": "defense-evasion"
+        },
+        {
+          "id": "T1656",
+          "name": "Impersonation",
+          "tactic": "defense-evasion"
+        }
+      ],
+      "our_detection": [
+        "YARA Tycoon2FA_Invisible_Unicode_JS (6/6 tests passed)",
+        "YARA Tycoon2FA_Landing_Page_Artifacts"
+      ]
+    },
+    {
+      "stage": "5. Installation",
+      "tycoon2fa": "No malware is installed. Persistence is created in the identity instead: the attacker registers a new authenticator app or device (device registration -> Primary Refresh Token), which survives a password reset and session revocation.",
+      "evidence": [
+        "MS",
+        "EL"
+      ],
+      "techniques": [
+        {
+          "id": "T1098.005",
+          "name": "Account Manipulation: Device Registration",
+          "tactic": "persistence"
+        }
+      ],
+      "our_detection": []
+    },
+    {
+      "stage": "6. Command & Control",
+      "tycoon2fa": "The phishing page relays every keystroke to the attacker's backend (reverse proxy / WebSocket), which forwards it to the real Microsoft login and triggers the genuine MFA prompt; stolen data is sent out via Telegram bots.",
+      "evidence": [
+        "MS",
+        "SK",
+        "ES",
+        "OUR"
+      ],
+      "techniques": [
+        {
+          "id": "T1557",
+          "name": "Adversary-in-the-Middle",
+          "tactic": "credential-access"
+        },
+        {
+          "id": "T1071.001",
+          "name": "Application Layer Protocol: Web Protocols",
+          "tactic": "command-and-control"
+        },
+        {
+          "id": "T1567",
+          "name": "Exfiltration Over Web Service",
+          "tactic": "exfiltration"
+        }
+      ],
+      "our_detection": [
+        "76 relay / egress IPs (IOC matching)",
+        "Shodan fingerprint tcp/24442 + tcp/1050 to find new relay servers",
+        "YARA $ws string (new WebSocket)"
+      ]
+    },
+    {
+      "stage": "7. Actions on Objectives",
+      "tycoon2fa": "With the stolen session cookie the attacker signs in as the victim (axios User-Agent, OfficeHome app), enumerates the tenant via Microsoft Graph, hides activity with inbox rules, reads mail, sends follow-on phishing to contacts and commits payroll / BEC fraud.",
+      "evidence": [
+        "MS",
+        "EL",
+        "ES",
+        "OUR"
+      ],
+      "techniques": [
+        {
+          "id": "T1539",
+          "name": "Steal Web Session Cookie",
+          "tactic": "credential-access"
+        },
+        {
+          "id": "T1550.004",
+          "name": "Use Alternate Authentication Material: Web Session Cookie",
+          "tactic": "defense-evasion"
+        },
+        {
+          "id": "T1078.004",
+          "name": "Valid Accounts: Cloud Accounts",
+          "tactic": "initial-access"
+        },
+        {
+          "id": "T1087.004",
+          "name": "Account Discovery: Cloud Account",
+          "tactic": "discovery"
+        },
+        {
+          "id": "T1564.008",
+          "name": "Hide Artifacts: Email Hiding Rules",
+          "tactic": "defense-evasion"
+        },
+        {
+          "id": "T1114.002",
+          "name": "Email Collection: Remote Email Collection",
+          "tactic": "collection"
+        },
+        {
+          "id": "T1534",
+          "name": "Internal Spearphishing",
+          "tactic": "lateral-movement"
+        },
+        {
+          "id": "T1657",
+          "name": "Financial Theft",
+          "tactic": "impact"
+        }
+      ],
+      "our_detection": [
+        "Sigma tycoon2fa_axios_signin.yml (successful sign-in with axios UA)",
+        "IOC match of sign-in IPs (hunt_signin_logs.py)"
+      ]
+    }
+  ],
+  "covered_techniques": [
+    "T1583.001",
+    "T1566.001",
+    "T1566.002",
+    "T1204.001",
+    "T1204.002",
+    "T1027",
+    "T1557",
+    "T1071.001",
+    "T1539",
+    "T1550.004",
+    "T1078.004"
+  ]
+}
