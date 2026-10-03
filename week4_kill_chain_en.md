@@ -113,6 +113,8 @@ covered by us     : 11 (47%)
 
 [`killchain/tycoon2fa_attack_layer.json`](killchain/tycoon2fa_attack_layer.json) can be opened at <https://mitre-attack.github.io/attack-navigator/> → **Open Existing Layer → Upload from local** → select the file. Green techniques are covered by our detections, red ones are observed but not covered.
 
+![Tycoon2FA layer in MITRE ATT&CK Navigator](killchain/navigator_layer.png)
+
 ## 7. Kill Chain vs MITRE ATT&CK: what each gave us
 
 | | Lockheed Martin Kill Chain | MITRE ATT&CK |
