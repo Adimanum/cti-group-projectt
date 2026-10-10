@@ -55,6 +55,8 @@ The steps below are reconstructed from Microsoft's and Elastic's reporting. The 
 
 ## 4. Kill Chain stages mapped to ATT&CK
 
+> **Update after Week 5:** the hunts H1–H3 ([`week5_threat_hunting_en.md`](week5_threat_hunting_en.md)) closed three gaps (T1098.005, T1564.008, T1087.004). Coverage is now **14 of 23 (60%)**. The diagram and the Navigator layer in `killchain/` show this current state; the numbers below are the Week 4 snapshot (11 of 23).
+
 ![Tycoon2FA kill chain](killchain/kill_chain_diagram.png)
 
 Sources: **MS** = Microsoft 2026, **EL** = Elastic 2026, **SK** = Sekoia 2024, **TW** = Trustwave 2025, **ES** = eSentire, **OUR** = our own data. ✅ = covered by our Week 3 detections, ❌ = observed but not yet covered.
