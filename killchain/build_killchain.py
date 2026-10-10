@@ -45,7 +45,7 @@ layer = {
     "versions": {"navigator": "5.3.2", "layer": "4.5"},
     "domain": "enterprise-attack",
     "description": "Techniques observed in Tycoon2FA campaigns (Microsoft, Elastic, Sekoia, Trustwave, eSentire). "
-                   "Green = covered by our Week 3 detections (IOCs, YARA, Sigma); red = observed but not yet covered.",
+                   "Green = covered by our detections (Week 3 IOCs, YARA, Sigma + Week 5 hunts); red = observed but not yet covered.",
     "techniques": techniques,
     "gradient": {"colors": ["#f4a3a3", "#7fd17f"], "minValue": 1, "maxValue": 2},
     "legendItems": [{"label": "Observed, not covered", "color": "#f4a3a3"},
@@ -115,9 +115,8 @@ for i, st in enumerate(data["stages"]):
                                 facecolor=col, edgecolor="none"))
     ax.text(x + w / 2, 0.59, label, ha="center", va="center", fontsize=10, color=INK, weight="bold")
 
-ax.text(0.25, 0.05, f"{n_cov} of {n_all} mapped techniques are covered by our Week 3 detections "
-        "(✓ = IOC / YARA / Sigma coverage, ✗ = observed but not yet detected). "
-        "Gaps (Reconnaissance, Installation) become hunting hypotheses in Week 5.",
+ax.text(0.25, 0.05, f"{n_cov} of {n_all} mapped techniques are covered (✓) by our detections: Week 3 IOCs / YARA / Sigma "
+        "+ Week 5 hunts H1-H3. ✗ = observed in Tycoon2FA but not yet detected.",
         fontsize=9.5, color=INK2, va="bottom")
 fig.savefig(HERE / "kill_chain_diagram.png", dpi=140, facecolor=SURF, bbox_inches="tight")
 print("saved kill_chain_diagram.png, tycoon2fa_attack_layer.json, coverage.csv")

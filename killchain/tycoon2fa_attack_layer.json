@@ -5,7 +5,7 @@
     "layer": "4.5"
   },
   "domain": "enterprise-attack",
-  "description": "Techniques observed in Tycoon2FA campaigns (Microsoft, Elastic, Sekoia, Trustwave, eSentire). Green = covered by our Week 3 detections (IOCs, YARA, Sigma); red = observed but not yet covered.",
+  "description": "Techniques observed in Tycoon2FA campaigns (Microsoft, Elastic, Sekoia, Trustwave, eSentire). Green = covered by our detections (Week 3 IOCs, YARA, Sigma + Week 5 hunts); red = observed but not yet covered.",
   "techniques": [
     {
       "techniqueID": "T1589.002",
@@ -109,9 +109,9 @@
     {
       "techniqueID": "T1098.005",
       "tactic": "persistence",
-      "score": 1,
-      "color": "#f4a3a3",
-      "comment": "5. Installation: observed, NOT covered yet",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "5. Installation: covered by our detection",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -172,18 +172,18 @@
     {
       "techniqueID": "T1087.004",
       "tactic": "discovery",
-      "score": 1,
-      "color": "#f4a3a3",
-      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "7. Actions on Objectives: covered by our detection",
       "enabled": true,
       "showSubtechniques": true
     },
     {
       "techniqueID": "T1564.008",
       "tactic": "defense-evasion",
-      "score": 1,
-      "color": "#f4a3a3",
-      "comment": "7. Actions on Objectives: observed, NOT covered yet",
+      "score": 2,
+      "color": "#7fd17f",
+      "comment": "7. Actions on Objectives: covered by our detection",
       "enabled": true,
       "showSubtechniques": true
     },
