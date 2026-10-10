@@ -1,0 +1,34 @@
+``` Tycoon2FA hunts - Splunk SPL ```
+``` Upload hunting/hunt_logs.ndjson: Settings -> Add Data -> Upload, sourcetype _json, index tycoon2fa ```
+``` Time range: 03/15/2026 - 03/24/2026. Run one search at a time. ```
+
+``` H0  Intel-driven IOC sweep (T1078.004) ```
+index=tycoon2fa log_type=signin src_ip IN ("130.49.117.205" "138.249.139.6" "142.252.171.135" "142.252.86.104" "166.1.241.247" "166.1.255.233" "166.88.219.45" "170.168.215.64" "172.120.234.223" "172.120.57.92" "172.121.59.99" "193.228.131.161" "2604:4500:6:10b:0:2:1eeb:530c" "2604:4500:6:10b:0:2:2fea:c4fb" "2604:4500:6:10b:0:2:3fb6:cbee" "2604:4500:6:10b:0:2:586:e3b2" "2604:4500:6:10b:0:2:774:a001" "2604:4500:6:10b:0:2:98cd:e9db" "2604:4500:6:10b:0:2:b564:19b0" "2604:4500:6:10b:0:2:ca57:4ca5" "2604:4500:6:10b:0:2:ee45:2201" "2604:4500:8:9::3e68:deb8" "2a00:b703:fff2:37::1" "2a00:b703:fff2:3b::1" "2a00:b703:fff2:41::1" "2a00:b703:fff2:47::1" "2a00:b703:fff2:4b::1" "2a00:b703:fff2:4e::1" "2a0d:5600:124:61:0:1:7403:e7f6" "2a0d:5600:124:61:0:1:7cfd:3531" "2a0d:5600:124:61:0:1:7fa4:f33f" "2a0d:5600:124:61:0:1:b7a5:1d9d" "2a0d:5600:124:61:0:1:f718:9c0f" "2a0d:5600:124:61:0:1:fcef:d64e" "2a0d:5600:24:ff21:0:1:2775:73e0" "2a0d:5600:24:ff21:0:1:3087:71de" "2a0d:5600:24:ff21:0:1:3fed:51a4" "2a0d:5600:24:ff21:0:1:6b36:e2f6" "2a0d:5600:24:ff21:0:1:81db:115a" "2a0d:5600:24:ff21:0:1:adec:d8f7" "2a0d:5600:24:ff21:0:1:c3cf:2c47" "2a0d:5600:24:ff21:0:1:e8d7:aa16" "2a0d:5600:24:ff21:0:1:f35c:ca3d" "2a0d:5600:24:ff39:0:1:5673:8177" "2a0d:5600:24:ff39:0:1:6f4c:16dd" "2a0d:5600:24:ff39:0:1:749e:5188" "2a0d:5600:24:ff39:0:1:869b:9236" "2a0d:5600:24:ff39:0:1:9b9:d19b" "2a0d:5600:24:ff39:0:1:b23:5fe0" "2a0d:5600:8:2e:0:1:25dd:3b4a" "2a0d:5600:8:2e:0:1:3af1:899c" "2a0d:5600:8:2e:0:1:62fe:e6b9" "2a0d:5600:8:2e:0:1:65f4:6a3c" "2a0d:5600:8:2e:0:1:6d7f:753" "2a0d:5600:8:2e:0:1:7d4:e433" "2a0d:5600:8:2e:0:1:96bc:d06d" "2a0d:5600:8:2e:0:1:cc85:d594" "2a0d:5600:8:2e:0:1:d823:a25a" "2a0d:5600:8:2e:0:1:e2a3:6d30" "2a0d:5600:8:94::1d9d:c800" "2a0d:5600:8:94::3fa0:7083" "2a0d:5600:8:94::440:e534" "2a0d:5600:8:94::5224:ed92" "2a0d:5600:8:94::b027:d883" "2a0d:5600:8:94::d434:ec28" "2a0d:5600:8:94::d439:3ac9" "2a0d:5600:8:94::d593:6202" "2a0d:5600:8:94::e66:fb26" "2a0d:5600:8:94::f1eb:760f" "2a0d:5600:8:94::f2cd:9d43" "2a0d:5600:8:a6:0:1:57d3:a529" "2a0d:5600:8:a6:0:1:6a62:40cb" "2a0d:5600:8:a6:0:1:b95f:905f" "2a0d:5600:8:a6:0:1:c2ee:fb2b" "45.39.175.12" "50.118.198.26")
+| table _time user src_ip user_agent result | sort _time
+
+``` H1a Step 1: successful sign-ins with a non-browser User-Agent (T1550.004) ```
+index=tycoon2fa log_type=signin result=success (user_agent="axios/*" OR user_agent="node-fetch*" OR user_agent="undici*" OR user_agent="node" OR user_agent="python-requests*")
+| stats count AS signins values(user_agent) AS user_agents values(src_ip) AS ips BY user
+
+``` H1  Step 2: non-browser sign-in -> new MFA method / device within 60 min (T1098.005) ```
+index=tycoon2fa ((log_type=signin result=success (user_agent="axios/*" OR user_agent="node-fetch*" OR user_agent="undici*" OR user_agent="node" OR user_agent="python-requests*")) OR (log_type=audit (operation="User registered security info" OR operation="Register device")))
+| bin _time span=1d AS day
+| stats min(eval(if(log_type="signin", _time, null()))) AS odd_signin max(eval(if(log_type="audit", _time, null()))) AS registered values(user_agent) AS user_agents values(src_ip) AS ips BY user day
+| where isnotnull(odd_signin) AND isnotnull(registered) AND registered>=odd_signin AND registered-odd_signin<=3600
+| eval minutes_after=round((registered-odd_signin)/60), odd_signin=strftime(odd_signin,"%F %T"), registered=strftime(registered,"%F %T")
+
+``` H2  Delete/hide inbox rule within 2 h after a sign-in from an unknown ASN (T1564.008) ```
+index=tycoon2fa ((log_type=mailbox operation="New-InboxRule" (details="*DeleteMessage=True*" OR details="*MarkAsRead=True*")) OR (log_type=signin result=success NOT asn IN (64500, 64501)))
+| bin _time span=1d AS day
+| stats min(eval(if(log_type="signin", _time, null()))) AS risky_signin max(eval(if(log_type="mailbox", _time, null()))) AS rule_created values(asn_name) AS asn_names values(details) AS rule BY user day
+| where isnotnull(risky_signin) AND isnotnull(rule_created) AND rule_created>=risky_signin AND rule_created-risky_signin<=7200
+
+``` H3a Graph burst, raw (T1087.004) ```
+index=tycoon2fa log_type=graph
+| stats count AS calls dc(request_uri) AS endpoints range(_time) AS seconds min(_time) AS first BY session_id user src_ip app_name
+| where calls>=20 AND seconds<=60 | sort first
+
+``` H3  Graph burst, tuned: + at least 8 different endpoints ```
+index=tycoon2fa log_type=graph
+| stats count AS calls dc(request_uri) AS endpoints range(_time) AS seconds min(_time) AS first BY session_id user src_ip app_name
+| where calls>=20 AND seconds<=60 AND endpoints>=8 | sort first

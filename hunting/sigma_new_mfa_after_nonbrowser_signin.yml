@@ -1,0 +1,74 @@
+# Sigma rules created from Week 5 hunt H1 (hunt -> detection).
+# Two base rules + one temporal correlation (Sigma correlation specification v2).
+title: Successful Entra ID sign-in with a non-browser User-Agent
+id: 3b1f7c52-5d1e-4a8e-9f0b-1c2d3e4f5a01
+name: nonbrowser_signin
+status: experimental
+description: Successful sign-in whose User-Agent is an HTTP library (axios, node-fetch, undici, python-requests). Tycoon2FA replays stolen session tokens with such clients.
+author: CS-2426 group project (Dilnaz Estaikyzy, Ademi Akmaganbet)
+date: 2026-10-10
+tags:
+  - attack.defense-evasion
+  - attack.t1550.004
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection:
+    ResultType: '0'
+    UserAgent|startswith:
+      - 'axios/'
+      - 'node-fetch'
+      - 'undici'
+      - 'python-requests'
+  condition: selection
+level: medium
+---
+title: New MFA method or device registered
+id: 3b1f7c52-5d1e-4a8e-9f0b-1c2d3e4f5a02
+name: new_auth_method
+status: experimental
+description: A user registered new security info (MFA method) or a new device in Entra ID.
+author: CS-2426 group project (Dilnaz Estaikyzy, Ademi Akmaganbet)
+date: 2026-10-10
+tags:
+  - attack.persistence
+  - attack.t1098.005
+logsource:
+  product: azure
+  service: auditlogs
+detection:
+  selection:
+    OperationName:
+      - 'User registered security info'
+      - 'Register device'
+  condition: selection
+level: low
+---
+title: Tycoon2FA persistence - non-browser sign-in followed by new MFA method or device within 60 minutes
+id: 3b1f7c52-5d1e-4a8e-9f0b-1c2d3e4f5a03
+status: experimental
+description: |
+  Built from hunt H1 (week5_threat_hunting_en.md). In the hunt it found all 3 compromised users with 0 false
+  positives, while the internal python-requests reporting script (non-browser UA, but no MFA change) was
+  correctly ignored.
+author: CS-2426 group project (Dilnaz Estaikyzy, Ademi Akmaganbet)
+date: 2026-10-10
+correlation:
+  type: temporal_ordered
+  rules:
+    - nonbrowser_signin
+    - new_auth_method
+  group-by:
+    - user
+  aliases:            # the user field has a different name in each log source
+    user:
+      nonbrowser_signin: UserPrincipalName
+      new_auth_method: InitiatedBy.user.userPrincipalName
+  timespan: 60m
+falsepositives:
+  - Interactive admin scripts that sign in as a user and then register a device (rare)
+level: high
+tags:
+  - attack.persistence
+  - attack.t1098.005

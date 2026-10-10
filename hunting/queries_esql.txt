@@ -1,0 +1,72 @@
+// Tycoon2FA hunts - Elastic ES|QL (Kibana -> Discover -> switch to ES|QL)
+// Index: tycoon2fa-hunt  (created by uploading hunting/hunt_logs.ndjson with Kibana "Upload a file")
+// Set the time picker to: Mar 15, 2026 -> Mar 24, 2026
+// Run one query at a time.
+
+// ---------- H0  Intel-driven IOC sweep (T1078.004) ----------
+FROM tycoon2fa-hunt
+| WHERE log_type == "signin" AND TO_STRING(src_ip) IN ("130.49.117.205", "138.249.139.6", "142.252.171.135", "142.252.86.104", "166.1.241.247", "166.1.255.233", "166.88.219.45", "170.168.215.64", "172.120.234.223", "172.120.57.92", "172.121.59.99", "193.228.131.161", "2604:4500:6:10b:0:2:1eeb:530c", "2604:4500:6:10b:0:2:2fea:c4fb", "2604:4500:6:10b:0:2:3fb6:cbee", "2604:4500:6:10b:0:2:586:e3b2", "2604:4500:6:10b:0:2:774:a001", "2604:4500:6:10b:0:2:98cd:e9db", "2604:4500:6:10b:0:2:b564:19b0", "2604:4500:6:10b:0:2:ca57:4ca5", "2604:4500:6:10b:0:2:ee45:2201", "2604:4500:8:9::3e68:deb8", "2a00:b703:fff2:37::1", "2a00:b703:fff2:3b::1", "2a00:b703:fff2:41::1", "2a00:b703:fff2:47::1", "2a00:b703:fff2:4b::1", "2a00:b703:fff2:4e::1", "2a0d:5600:124:61:0:1:7403:e7f6", "2a0d:5600:124:61:0:1:7cfd:3531", "2a0d:5600:124:61:0:1:7fa4:f33f", "2a0d:5600:124:61:0:1:b7a5:1d9d", "2a0d:5600:124:61:0:1:f718:9c0f", "2a0d:5600:124:61:0:1:fcef:d64e", "2a0d:5600:24:ff21:0:1:2775:73e0", "2a0d:5600:24:ff21:0:1:3087:71de", "2a0d:5600:24:ff21:0:1:3fed:51a4", "2a0d:5600:24:ff21:0:1:6b36:e2f6", "2a0d:5600:24:ff21:0:1:81db:115a", "2a0d:5600:24:ff21:0:1:adec:d8f7", "2a0d:5600:24:ff21:0:1:c3cf:2c47", "2a0d:5600:24:ff21:0:1:e8d7:aa16", "2a0d:5600:24:ff21:0:1:f35c:ca3d", "2a0d:5600:24:ff39:0:1:5673:8177", "2a0d:5600:24:ff39:0:1:6f4c:16dd", "2a0d:5600:24:ff39:0:1:749e:5188", "2a0d:5600:24:ff39:0:1:869b:9236", "2a0d:5600:24:ff39:0:1:9b9:d19b", "2a0d:5600:24:ff39:0:1:b23:5fe0", "2a0d:5600:8:2e:0:1:25dd:3b4a", "2a0d:5600:8:2e:0:1:3af1:899c", "2a0d:5600:8:2e:0:1:62fe:e6b9", "2a0d:5600:8:2e:0:1:65f4:6a3c", "2a0d:5600:8:2e:0:1:6d7f:753", "2a0d:5600:8:2e:0:1:7d4:e433", "2a0d:5600:8:2e:0:1:96bc:d06d", "2a0d:5600:8:2e:0:1:cc85:d594", "2a0d:5600:8:2e:0:1:d823:a25a", "2a0d:5600:8:2e:0:1:e2a3:6d30", "2a0d:5600:8:94::1d9d:c800", "2a0d:5600:8:94::3fa0:7083", "2a0d:5600:8:94::440:e534", "2a0d:5600:8:94::5224:ed92", "2a0d:5600:8:94::b027:d883", "2a0d:5600:8:94::d434:ec28", "2a0d:5600:8:94::d439:3ac9", "2a0d:5600:8:94::d593:6202", "2a0d:5600:8:94::e66:fb26", "2a0d:5600:8:94::f1eb:760f", "2a0d:5600:8:94::f2cd:9d43", "2a0d:5600:8:a6:0:1:57d3:a529", "2a0d:5600:8:a6:0:1:6a62:40cb", "2a0d:5600:8:a6:0:1:b95f:905f", "2a0d:5600:8:a6:0:1:c2ee:fb2b", "45.39.175.12", "50.118.198.26")
+| KEEP @timestamp, user, src_ip, user_agent, result
+| SORT @timestamp
+
+// ---------- H1a Step 1: successful sign-ins with a non-browser User-Agent (T1550.004) ----------
+FROM tycoon2fa-hunt
+| WHERE log_type == "signin" AND result == "success" AND (user_agent LIKE "axios/*" OR user_agent LIKE "node-fetch*" OR user_agent LIKE "undici*" OR user_agent == "node" OR user_agent LIKE "python-requests*")
+| STATS signins = COUNT(*), user_agents = VALUES(user_agent), ips = VALUES(src_ip) BY user
+
+// ---------- H1  Step 2: non-browser sign-in -> new MFA method / device within 60 min (T1098.005) ----------
+FROM tycoon2fa-hunt
+| WHERE (log_type == "signin" AND result == "success" AND (user_agent LIKE "axios/*" OR user_agent LIKE "node-fetch*" OR user_agent LIKE "undici*" OR user_agent == "node" OR user_agent LIKE "python-requests*"))
+     OR (log_type == "audit" AND operation IN ("User registered security info", "Register device"))
+| EVAL signin_ts = CASE(log_type == "signin", @timestamp), reg_ts = CASE(log_type == "audit", @timestamp)
+| EVAL day = DATE_TRUNC(1 day, @timestamp)
+| STATS odd_signin = MIN(signin_ts), registered = MAX(reg_ts), user_agents = VALUES(user_agent), ips = VALUES(src_ip) BY user, day
+| WHERE odd_signin IS NOT NULL AND registered IS NOT NULL
+| EVAL minutes_after = DATE_DIFF("minute", odd_signin, registered)
+| WHERE minutes_after >= 0 AND minutes_after <= 60
+// (ES|QL compares the first odd sign-in with the last registration of the same day; the exact
+//  "followed within 60 min" logic is the EQL sequence at the end of this file)
+
+// ---------- H2  Delete/hide inbox rule within 2 h after a sign-in from an unknown ASN (T1564.008) ----------
+FROM tycoon2fa-hunt
+| WHERE (log_type == "mailbox" AND operation == "New-InboxRule" AND (details LIKE "*DeleteMessage=True*" OR details LIKE "*MarkAsRead=True*"))
+     OR (log_type == "signin" AND result == "success" AND TO_STRING(asn) NOT IN ("64500", "64501"))
+| EVAL rule_ts = CASE(log_type == "mailbox", @timestamp), risky_ts = CASE(log_type == "signin", @timestamp)
+| EVAL day = DATE_TRUNC(1 day, @timestamp)
+| STATS risky_signin = MIN(risky_ts), rule_created = MAX(rule_ts), asn_names = VALUES(asn_name), rule = VALUES(details) BY user, day
+| WHERE risky_signin IS NOT NULL AND rule_created IS NOT NULL
+| EVAL minutes_after = DATE_DIFF("minute", risky_signin, rule_created)
+| WHERE minutes_after >= 0 AND minutes_after <= 120
+
+// ---------- H3a Graph burst, raw: >= 20 calls in one session within 60 s (T1087.004) ----------
+FROM tycoon2fa-hunt
+| WHERE log_type == "graph"
+| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first = MIN(@timestamp), last = MAX(@timestamp) BY session_id, user, src_ip, app_name
+| EVAL seconds = DATE_DIFF("second", first, last)
+| WHERE calls >= 20 AND seconds <= 60
+| SORT first
+
+// ---------- H3  Graph burst, tuned: + at least 8 different endpoints ----------
+FROM tycoon2fa-hunt
+| WHERE log_type == "graph"
+| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first = MIN(@timestamp), last = MAX(@timestamp) BY session_id, user, src_ip, app_name
+| EVAL seconds = DATE_DIFF("second", first, last)
+| WHERE calls >= 20 AND seconds <= 60 AND endpoints >= 8
+| SORT first
+
+// ======================================================================================
+// Exact time-ordered versions with EQL (Kibana -> Security -> Timelines -> Correlation tab,
+// data view / index pattern: tycoon2fa-hunt). "any where" works without an event.category field.
+// ======================================================================================
+
+// H1 (EQL)
+sequence by user with maxspan=60m
+  [any where log_type == "signin" and result == "success" and
+       (user_agent like~ "axios/*" or user_agent like~ "node-fetch*" or user_agent like~ "undici*" or user_agent like~ "python-requests*")]
+  [any where log_type == "audit" and operation in ("User registered security info", "Register device")]
+
+// H2 (EQL)
+sequence by user with maxspan=120m
+  [any where log_type == "signin" and result == "success" and not asn in (64500, 64501)]
+  [any where log_type == "mailbox" and operation == "New-InboxRule" and
+       (details like~ "*DeleteMessage=True*" or details like~ "*MarkAsRead=True*")]

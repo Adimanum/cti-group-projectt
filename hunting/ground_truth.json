@@ -1,0 +1,12 @@
+{
+  "malicious_users": {
+    "aliya.zhaksybek@contoso.example": "full chain: IOC IP + axios + new MFA + Graph recon + delete rule",
+    "askar.karimov@contoso.example": "IOC IPv6 + axios + new MFA method",
+    "dana.abenova@contoso.example": "NEW infrastructure (not in any IOC list) + node-fetch + device registration + Graph recon"
+  },
+  "false_positive_traps": {
+    "svc-reporting@contoso.example": "internal reporting script: non-browser UA from the corporate network, no MFA change",
+    "svc-backup@contoso.example": "approved backup application: Graph burst every night from the corporate network",
+    "aliya.akhmetova@contoso.example": "user deletes promo mail from the office network: delete rule, but no risky sign-in"
+  }
+}

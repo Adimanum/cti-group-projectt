@@ -1,0 +1,61 @@
+# Tycoon2FA hunt results  (dataset: 4858 events, hunt_logs.ndjson; IOC list: 76 IPs)
+# ground truth: 3 compromised users = aliya.zhaksybek@contoso.example, askar.karimov@contoso.example, dana.abenova@contoso.example
+
+## H0 [T1078.004] Intel-driven IOC sweep: any sign-in from the 76 Tycoon2FA egress IPs (Week 3 dataset)
+   user | ts | src_ip | user_agent | result
+   aliya.zhaksybek@contoso.example | 2026-03-19T09:11:00.000Z | 142.252.171.135 | Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.17328) | success
+   aliya.zhaksybek@contoso.example | 2026-03-19T09:14:00.000Z | 142.252.171.135 | axios/1.13.6 | success
+   askar.karimov@contoso.example | 2026-03-20T14:59:00.000Z | 2a0d:5600:8:94::f2cd:9d43 | Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHT | success
+   askar.karimov@contoso.example | 2026-03-20T15:02:00.000Z | 2a0d:5600:8:94::f2cd:9d43 | axios/1.13.2 | success
+   => users flagged: 2  TP=2  FP=0   not flagged=1
+
+## H1a [T1550.004] Step 1 (broad): successful sign-ins with a non-browser User-Agent
+   user | signins | user_agents | ips
+   aliya.zhaksybek@contoso.example | 1 | axios/1.13.6 | 142.252.171.135
+   askar.karimov@contoso.example | 1 | axios/1.13.2 | 2a0d:5600:8:94::f2cd:9d43
+   dana.abenova@contoso.example | 1 | node-fetch/1.0 | 203.0.113.77
+   svc-reporting@contoso.example | 7 | python-requests/2.32.3 | 192.0.2.5
+   => users flagged: 4  TP=3  FP=1 ['svc-reporting@contoso.example']  not flagged=0
+
+## H1 [T1098.005] Step 2 (correlated): non-browser sign-in followed within 60 min by a new MFA method or device registration
+   user | odd_signin | user_agent | src_ip | registered | operation | details | minutes_after
+   aliya.zhaksybek@contoso.example | 2026-03-19T09:14:00.000Z | axios/1.13.6 | 142.252.171.135 | 2026-03-19T09:31:00.000Z | User registered security info | Authenticator App (attacker phone) | 17
+   askar.karimov@contoso.example | 2026-03-20T15:02:00.000Z | axios/1.13.2 | 2a0d:5600:8:94::f2cd:9d43 | 2026-03-20T15:26:00.000Z | User registered security info | Authenticator App (attacker phone) | 24
+   dana.abenova@contoso.example | 2026-03-21T22:40:00.000Z | node-fetch/1.0 | 203.0.113.77 | 2026-03-21T23:01:00.000Z | Register device | DeviceName=DESKTOP-7F3K2Q; join type=Azure AD registered -> PRT | 21
+   => users flagged: 3  TP=3  FP=0   not flagged=0
+
+## H2 [T1564.008] New inbox rule that deletes / hides mail, created within 2 h after a sign-in from an unknown (hosting) ASN
+   user | risky_signin | src_ip | asn_name | rule_created | details | minutes_after
+   aliya.zhaksybek@contoso.example | 2026-03-19T09:11:00.000Z | 142.252.171.135 | IT HOSTLINE LTD | 2026-03-19T09:46:00.000Z | Name=.; SubjectOrBodyContains=invoice,payroll,payment,bank; DeleteMess | 35
+   => users flagged: 1  TP=1  FP=0   not flagged=2
+
+## H3a [T1087.004] Graph burst (raw): one session with >= 20 Graph calls inside 60 s
+   user | session_id | src_ip | app_name | calls | endpoints | seconds
+   svc-backup@contoso.example | 52cee884-aaa8-e148 | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   svc-backup@contoso.example | d7a23b88-9c44-b39f | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   svc-backup@contoso.example | 70d66f5f-36dd-fa30 | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   svc-backup@contoso.example | dd7cac85-9eaa-2c1f | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   aliya.zhaksybek@contoso.example | 06311372-6f41-2318 | 142.252.171.135 | OfficeHome | 42 | 12 | 36
+   svc-backup@contoso.example | 11a2b24e-1336-0992 | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   svc-backup@contoso.example | 9b1c475c-e4fd-6d28 | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   dana.abenova@contoso.example | a27a160b-924a-7603 | 203.0.113.77 | OfficeHome | 42 | 12 | 36
+   svc-backup@contoso.example | 4885b564-d309-de00 | 192.0.2.6 | Contoso Mail Backup | 120 | 3 | 47
+   => users flagged: 3  TP=2  FP=1 ['svc-backup@contoso.example']  not flagged=1
+
+## H3 [T1087.004] Graph burst (tuned): same, but >= 8 DIFFERENT endpoints (reconnaissance, not bulk export)
+   user | session_id | src_ip | app_name | calls | endpoints | seconds
+   aliya.zhaksybek@contoso.example | 06311372-6f41-2318 | 142.252.171.135 | OfficeHome | 42 | 12 | 36
+   dana.abenova@contoso.example | a27a160b-924a-7603 | 203.0.113.77 | OfficeHome | 42 | 12 | 36
+   => users flagged: 2  TP=2  FP=0   not flagged=1
+
+## Summary
+   hunt | technique | flagged users | true positives | false positives | compromised users not flagged
+   H0 | T1078.004 | 2 | 2 | 0 | 1
+   H1a | T1550.004 | 4 | 3 | 1 | 0
+   H1 | T1098.005 | 3 | 3 | 0 | 0
+   H2 | T1564.008 | 1 | 1 | 0 | 2
+   H3a | T1087.004 | 3 | 2 | 1 | 1
+   H3 | T1087.004 | 2 | 2 | 0 | 1
+
+# Combined (H0 + H1 + H2 + H3): 3/3 compromised users found, 0 false positives
+# Note: 'not flagged' counts compromised users the hunt did not flag. Not every victim performed every behaviour (only one created an inbox rule), so H2/H3 are expected to see only some of them.
