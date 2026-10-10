@@ -2,6 +2,8 @@
 // Index: tycoon2fa-hunt  (created by uploading hunting/hunt_logs.ndjson with Kibana "Upload a file")
 // Set the time picker to: Mar 15, 2026 -> Mar 24, 2026
 // Run one query at a time.
+// Tested in Elastic Cloud (Serverless, 2026-10-10). user_agent is mapped as text on upload, so it is
+// converted with TO_STRING(); "first"/"last" are reserved words in ES|QL, so the columns are first_call/last_call.
 
 // ---------- H0  Intel-driven IOC sweep (T1078.004) ----------
 FROM tycoon2fa-hunt
@@ -11,16 +13,18 @@ FROM tycoon2fa-hunt
 
 // ---------- H1a Step 1: successful sign-ins with a non-browser User-Agent (T1550.004) ----------
 FROM tycoon2fa-hunt
-| WHERE log_type == "signin" AND result == "success" AND (user_agent LIKE "axios/*" OR user_agent LIKE "node-fetch*" OR user_agent LIKE "undici*" OR user_agent == "node" OR user_agent LIKE "python-requests*")
-| STATS signins = COUNT(*), user_agents = VALUES(user_agent), ips = VALUES(src_ip) BY user
+| EVAL ua = TO_STRING(user_agent)
+| WHERE log_type == "signin" AND result == "success" AND (ua LIKE "axios/*" OR ua LIKE "node-fetch*" OR ua LIKE "undici*" OR ua == "node" OR ua LIKE "python-requests*")
+| STATS signins = COUNT(*), user_agents = VALUES(ua), ips = VALUES(src_ip) BY user
 
 // ---------- H1  Step 2: non-browser sign-in -> new MFA method / device within 60 min (T1098.005) ----------
 FROM tycoon2fa-hunt
-| WHERE (log_type == "signin" AND result == "success" AND (user_agent LIKE "axios/*" OR user_agent LIKE "node-fetch*" OR user_agent LIKE "undici*" OR user_agent == "node" OR user_agent LIKE "python-requests*"))
+| EVAL ua = TO_STRING(user_agent)
+| WHERE (log_type == "signin" AND result == "success" AND (ua LIKE "axios/*" OR ua LIKE "node-fetch*" OR ua LIKE "undici*" OR ua == "node" OR ua LIKE "python-requests*"))
      OR (log_type == "audit" AND operation IN ("User registered security info", "Register device"))
 | EVAL signin_ts = CASE(log_type == "signin", @timestamp), reg_ts = CASE(log_type == "audit", @timestamp)
 | EVAL day = DATE_TRUNC(1 day, @timestamp)
-| STATS odd_signin = MIN(signin_ts), registered = MAX(reg_ts), user_agents = VALUES(user_agent), ips = VALUES(src_ip) BY user, day
+| STATS odd_signin = MIN(signin_ts), registered = MAX(reg_ts), user_agents = VALUES(ua), ips = VALUES(src_ip) BY user, day
 | WHERE odd_signin IS NOT NULL AND registered IS NOT NULL
 | EVAL minutes_after = DATE_DIFF("minute", odd_signin, registered)
 | WHERE minutes_after >= 0 AND minutes_after <= 60
@@ -41,18 +45,18 @@ FROM tycoon2fa-hunt
 // ---------- H3a Graph burst, raw: >= 20 calls in one session within 60 s (T1087.004) ----------
 FROM tycoon2fa-hunt
 | WHERE log_type == "graph"
-| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first = MIN(@timestamp), last = MAX(@timestamp) BY session_id, user, src_ip, app_name
-| EVAL seconds = DATE_DIFF("second", first, last)
+| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first_call = MIN(@timestamp), last_call = MAX(@timestamp) BY session_id, user, src_ip, app_name
+| EVAL seconds = DATE_DIFF("second", first_call, last_call)
 | WHERE calls >= 20 AND seconds <= 60
-| SORT first
+| SORT first_call
 
 // ---------- H3  Graph burst, tuned: + at least 8 different endpoints ----------
 FROM tycoon2fa-hunt
 | WHERE log_type == "graph"
-| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first = MIN(@timestamp), last = MAX(@timestamp) BY session_id, user, src_ip, app_name
-| EVAL seconds = DATE_DIFF("second", first, last)
+| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri), first_call = MIN(@timestamp), last_call = MAX(@timestamp) BY session_id, user, src_ip, app_name
+| EVAL seconds = DATE_DIFF("second", first_call, last_call)
 | WHERE calls >= 20 AND seconds <= 60 AND endpoints >= 8
-| SORT first
+| SORT first_call
 
 // ======================================================================================
 // Exact time-ordered versions with EQL (Kibana -> Security -> Timelines -> Correlation tab,
