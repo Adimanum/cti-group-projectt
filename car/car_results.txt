@@ -1,0 +1,15 @@
+# CAR-2013-02-008 (Simultaneous Logins) adapted to cloud sign-ins
+# dataset: hunt_logs.ndjson (1883 successful sign-ins), window = 1 hour
+# logic: same account active from 2+ distinct ASNs (>=1 external) within 1 hour
+
+user                              first login (ASN)                             second login (ASN)
+aliya.zhaksybek@contoso.example   08:55  CONTOSO-CORP (192.0.2.20)              09:11  IT HOSTLINE LTD (142.252.171.135)
+askar.karimov@contoso.example     14:04  CONTOSO-CORP (192.0.2.43)              14:59  M247 Europe SRL (2a0d:5600:8:94::f2cd:9d43)
+
+flagged users : 2   true positives : 2   false positives : 0
+compromised users found : 2/3   not flagged : ['dana.abenova@contoso.example']
+
+# Note: this analytic finds overlapping sessions. It catches victims whose real (KZ) session
+# and the attacker's external session overlap within the hour. A victim with no concurrent
+# legitimate session in the window is missed here - that case is caught by the Week 5 hunts
+# (H1 new-MFA, H3 Graph burst). One analytic is not full coverage; analytics complement each other.

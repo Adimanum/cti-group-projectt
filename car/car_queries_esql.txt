@@ -1,0 +1,24 @@
+// CAR-2013-02-008 "Simultaneous Logins", adapted to cloud sign-ins - Elastic ES|QL
+// Index: tycoon2fa-hunt (the Week 5 dataset). Time range: Mar 15 -> Mar 24, 2026.
+//
+// Idea: the same user account authenticates successfully from two different ASNs within one hour,
+// and at least one ASN is NOT the corporate network (64500) or the staff home ISP (64501).
+// ES|QL has no self-join, so we bucket into 1-hour windows and count distinct ASNs per user+window.
+
+FROM tycoon2fa-hunt
+| WHERE log_type == "signin" AND result == "success"
+| EVAL window = DATE_TRUNC(1 hour, @timestamp)
+| STATS asn_count = COUNT_DISTINCT(asn),
+        external = COUNT_DISTINCT(CASE(asn IN (64500, 64501), NULL, asn)),
+        asns = VALUES(asn_name), ips = VALUES(src_ip)
+      BY user, window
+| WHERE asn_count >= 2 AND external >= 1
+| SORT window
+
+// --- Splunk SPL version ---------------------------------------------------------------
+// index=tycoon2fa log_type=signin result=success
+// | bin _time span=1h AS window
+// | eval ext=if(asn IN (64500,64501), null(), asn)
+// | stats dc(asn) AS asn_count dc(ext) AS external values(asn_name) AS asns values(src_ip) AS ips BY user window
+// | where asn_count>=2 AND external>=1
+// | sort window
