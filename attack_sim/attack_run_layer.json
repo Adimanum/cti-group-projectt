@@ -1,0 +1,71 @@
+{
+  "name": "Tycoon2FA - Week 6 T1557 simulation",
+  "versions": {
+    "navigator": "5.3.2",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Techniques exercised by our safe localhost Adversary-in-the-Middle simulation (attack_sim/aitm_lab.py). Red = reproduced in the lab.",
+  "techniques": [
+    {
+      "techniqueID": "T1557",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#e34949",
+      "comment": "Exercised by the Week 6 localhost T1557 simulation: Adversary-in-the-Middle",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1111",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#e34949",
+      "comment": "Exercised by the Week 6 localhost T1557 simulation: Multi-Factor Authentication Interception",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1539",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#e34949",
+      "comment": "Exercised by the Week 6 localhost T1557 simulation: Steal Web Session Cookie",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1567",
+      "tactic": "exfiltration",
+      "score": 1,
+      "color": "#e34949",
+      "comment": "Exercised by the Week 6 localhost T1557 simulation: Exfiltration Over Web Service",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1550.004",
+      "tactic": "defense-evasion",
+      "score": 1,
+      "color": "#e34949",
+      "comment": "Exercised by the Week 6 localhost T1557 simulation: Use Alternate Authentication Material: Web Session Cookie",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#ffe766",
+      "#e34949"
+    ],
+    "minValue": 0,
+    "maxValue": 1
+  },
+  "legendItems": [
+    {
+      "label": "Reproduced in the simulation",
+      "color": "#e34949"
+    }
+  ],
+  "layout": {
+    "layout": "side",
+    "showID": true,
+    "showName": true
+  },
+  "hideDisabled": false
+}

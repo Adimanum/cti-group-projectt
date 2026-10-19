@@ -1,0 +1,15 @@
+=== T1557 Adversary-in-the-Middle: safe localhost lab (all data is fake) ===
+legit ACME server : http://127.0.0.1:8721
+attacker AiTM proxy: http://127.0.0.1:8722
+
+[victim] opening login page via link in phishing email -> http://127.0.0.1:8722
+[victim] typing password and the MFA code from the authenticator app
+[proxy] intercepted credentials  user=alice@acme.example password=Passw0rd!
+[proxy] intercepted live MFA code otp=314159
+[proxy] STOLE session cookie   ACMEAUTH=ACME-SESSION-3eb3e1ece82045b897e5318d5eda7132
+[victim] login looks successful: {'status': 'ok', 'user': 'alice@acme.example'}  (victim suspects nothing)
+
+[attacker] replaying stolen cookie from its own server (axios), no password needed
+[attacker] access as alice@acme.example granted = True  <-- MFA fully bypassed
+
+=== result: the kit never needed the password or MFA again - it has the session ===
