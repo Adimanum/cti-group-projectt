@@ -17,7 +17,8 @@ We follow the course's weekly structure. Each week adds one step of the threat i
 3. Process the data: build an IOC dataset, then filter and normalize it, store it in MISP, and write and test detection rules (YARA, Sigma).
 4. Map the attack to the Cyber Kill Chain and MITRE ATT&CK and measure our detection coverage.
 5. Hunt for the gaps with hypothesis-driven threat hunting and turn the best hunt into a detection.
-6. Later weeks: study single techniques in depth, use MITRE CAR, and emulate the attack.
+6. Study a single technique in depth (T1557) and simulate it; use a MITRE CAR analytic in the SIEM.
+7. Later weeks: build an adversary emulation plan, run Atomic Red Team tests, and study APT techniques.
 
 ## Weekly progress
 
@@ -28,6 +29,8 @@ We follow the course's weekly structure. Each week adds one step of the threat i
 | 3 | Data Processing and Exploitation | Deploy MISP and import IOCs; filtering and normalization | Processing script → 667-indicator dataset + MISP event; filtering of stale / false-positive IOCs; 2 YARA rules (6/6 tests passed); Sigma rule + hunt | [`week3_misp_iocs_en.md`](week3_misp_iocs_en.md) |
 | 4 | The Cyber Kill Chain | Analyze a real-world attack with the Kill Chain; map each stage to ATT&CK TTPs | Tycoon2FA analysed through 7 stages, mapped to 23 ATT&CK techniques; ATT&CK Navigator layer; coverage measured (11/23 = 47%); courses-of-action matrix | [`week4_kill_chain_en.md`](week4_kill_chain_en.md) |
 | 5 | Threat Hunting Concept | Build a hypothesis-driven hunting scenario; execute hunt queries in Splunk or ELK | 4 hunts (1 intel-driven, 3 hypothesis-driven) over a 4,858-event Microsoft 365 dataset with 3 hidden intrusions; ES\|QL, EQL and SPL queries, executed in Elastic Cloud; all 3 victims found, 0 false positives; new Sigma correlation rule; ATT&CK coverage 47% → 60% | [`week5_threat_hunting_en.md`](week5_threat_hunting_en.md) |
+| 6 | The ATT&CK Framework | Study one technique in depth; simulate an attack and map it to ATT&CK | Deep dive on **T1557** (Adversary-in-the-Middle); a safe localhost simulation of the AiTM relay (dummy data) reproducing the full chain; 7 attacker actions mapped to 5 ATT&CK techniques; Navigator layer + mechanism diagram | [`week6_attack_technique_en.md`](week6_attack_technique_en.md) |
+| 7 | Using MITRE CAR | Select a CAR analytic and implement it in a SIEM; map it to ATT&CK | Implemented **CAR-2013-02-008 (Simultaneous Logins)** adapted to cloud sign-ins (ES\|QL + SPL); run over the dataset: 2/3 accounts, 0 false positives; mapped to T1078.004 / T1557 / T1550.004 (defence in depth) | [`week7_mitre_car_en.md`](week7_mitre_car_en.md) |
 
 ## Dataset
 
@@ -43,6 +46,7 @@ The processed dataset is [`dataset/tycoon2fa_iocs.csv`](dataset/tycoon2fa_iocs.c
 - Mapped to the Kill Chain, our detections covered **11 of 23 ATT&CK techniques** after Week 3. After the Week 5 hunts they cover **14 of 23 (60%)**, including identity persistence (new MFA method / device registration), which survives a password reset.
 - Threat hunting: an IOC sweep alone found **2 of 3** hidden intrusions (the attacker changed infrastructure). Behaviour hunts (*odd sign-in → new MFA method within 60 min*, hidden inbox rule, Graph recon burst) found **3 of 3 with 0 false positives**.
 - A behavioural **Sigma rule** (successful sign-in with an `axios/` User-Agent) catches session replay even from infrastructure that is not in any IOC list.
+- We **reproduced the T1557 relay** in a safe localhost lab and **implemented a MITRE CAR analytic** in the SIEM, giving a second, independent way to catch the same AiTM activity (defence in depth).
 
 ![Tycoon2FA kill chain](killchain/kill_chain_diagram.png)
 
@@ -73,7 +77,11 @@ The processed dataset is [`dataset/tycoon2fa_iocs.csv`](dataset/tycoon2fa_iocs.c
 │   ├── coverage.csv
 │   └── kill_chain_diagram.png
 ├── week5_threat_hunting_en.md             # Week 5 report (threat hunting)
+├── week6_attack_technique_en.md           # Week 6 report (T1557 deep dive + simulation)
+├── week7_mitre_car_en.md                  # Week 7 report (MITRE CAR analytic)
 ├── hunting/                               # Week 5: dataset, ES|QL / EQL / SPL hunts, results, Sigma rule
+├── attack_sim/                            # Week 6: safe localhost T1557 simulation, ATT&CK mapping, diagram
+├── car/                                   # Week 7: CAR analytic (ES|QL + SPL), results
 ├── detection/                             # Week 3: detection engineering
     ├── README.md
     ├── tycoon2fa.yar                      # YARA rules
@@ -92,6 +100,8 @@ for f in detection/sample_*; do yara detection/tycoon2fa.yar "$f"; done
 python3 detection/hunt_signin_logs.py
 python3 killchain/build_killchain.py
 python3 hunting/generate_logs.py && python3 hunting/run_hunts.py && python3 hunting/plot_timeline.py
+python3 attack_sim/aitm_lab.py && python3 attack_sim/map_to_attack.py && python3 attack_sim/plot_t1557.py
+python3 car/car_simultaneous_logins.py
 ```
 
 ## Use of AI tools
@@ -124,6 +134,8 @@ The AI was not used as a source of facts. All technical information comes from t
 17. C. Maurice, *The Foundations of Threat Hunting*, Packt, 2022; P. Smith, *Practical Threat Hunting*.
 18. Splunk SURGe, *PEAK Threat Hunting Framework*. <https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html>
 19. Elastic, ES|QL and EQL reference. <https://www.elastic.co/guide/en/elasticsearch/reference/current/esql.html> · SigmaHQ, Sigma correlation rules specification. <https://github.com/SigmaHQ/sigma-specification>
-20. ENISA, ENISA Threat Landscape (recommended reading, Week 1). <https://www.enisa.europa.eu/topics/cyber-threats/threat-landscape>
-21. M. Bazzell, *Open Source Intelligence Techniques* (recommended reading, Week 2).
-22. Recorded Future, *The Threat Intelligence Handbook* (Week 1 lecture source).
+20. MITRE Cyber Analytics Repository (CAR), analytic CAR-2013-02-008. <https://car.mitre.org/analytics/CAR-2013-02-008/>
+21. MITRE ATT&CK, T1557 Adversary-in-the-Middle. <https://attack.mitre.org/techniques/T1557/>
+22. ENISA, ENISA Threat Landscape (recommended reading, Week 1). <https://www.enisa.europa.eu/topics/cyber-threats/threat-landscape>
+23. M. Bazzell, *Open Source Intelligence Techniques* (recommended reading, Week 2).
+24. Recorded Future, *The Threat Intelligence Handbook* (Week 1 lecture source).
