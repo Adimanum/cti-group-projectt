@@ -1,0 +1,16 @@
+- id: c3c56567-dbbb-5f0f-8df3-f93f4e78b672
+  name: "06 Account Discovery: Cloud Account"
+  description: "Enumerate the tenant with a burst of Microsoft Graph calls (roles, users, contacts)."
+  tactic: discovery
+  technique:
+    attack_id: T1087.004
+    name: "Account Discovery: Cloud Account"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] 42 Graph calls to 12 endpoints in 36s (recon)'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] 42 Graph calls to 12 endpoints in 36s (recon)'

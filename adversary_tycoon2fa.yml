@@ -1,0 +1,16 @@
+id: c1cc07bf-1f40-58e2-8fec-d0e2e1126eae
+name: Tycoon2FA Emulation (CS-2426)
+description: >
+  Safe emulation of Tycoon2FA, ordered initial access -> persistence -> data exfiltration.
+  Every ability runs a harmless placeholder command. Load the abilities/ folder as a stockpile
+  and run this profile in a CALDERA range to generate telemetry for the blue team.
+atomic_ordering:
+  - 6e59ba6f-126d-5489-a7b2-cf76b71077d0
+  - 3e0c10fb-cea5-5d82-9158-876350ebfcc6
+  - 42487f7f-f600-536e-893c-57e4c4337ff6
+  - b4d41172-0495-5f6e-8f59-63697d763a36
+  - 4416cc4e-ff29-5481-a135-88f4779bf15d
+  - c3c56567-dbbb-5f0f-8df3-f93f4e78b672
+  - 20a47eff-8767-5e83-844c-c25747b5de68
+  - 993239fa-57a5-5ff1-b615-1c6411f36c08
+  - 3ee611d1-0658-5b89-bc4f-cabd8affcc56

@@ -1,0 +1,55 @@
+# Emulation run: Tycoon2FA adversary emulation plan  (group CS-2426)
+# SAFE dry-run - every command is a harmless placeholder. No real attack is performed.
+
+==================== PHASE: Initial Access ====================
+[01] T1566.002   Phishing: Spearphishing Link
+     procedure : Send a lure email with a link / QR code / SVG that points to the AiTM proxy.
+     result    : [emulate] sent lure email with link to AiTM proxy (no real email sent)
+     DETECTED BY: E-mail gateway + Week 2-3 URL/domain IOCs; YARA on HTML/SVG attachments
+
+[02] T1557       Adversary-in-the-Middle
+     procedure : Reverse proxy relays the victim's login to the real identity provider in real time.
+     result    : (step references: python3 attack_sim/aitm_lab.py  # the Week 6 safe localhost lab)
+     DETECTED BY: Week 6 simulation reproduces it; relay IP IOCs; Shodan fingerprint pivot
+
+[03] T1111       Multi-Factor Authentication Interception
+     procedure : Capture the live one-time MFA code as it passes through the proxy.
+     result    : [emulate] captured fake MFA code 314159 in transit
+     DETECTED BY: Inferred from the result: successful sign-in from attacker infra (Week 5 H1)
+
+[04] T1539       Steal Web Session Cookie
+     procedure : Steal the authenticated session cookie issued after MFA succeeds.
+     result    : [emulate] stole dummy session cookie ACME-SESSION-xxxx
+     DETECTED BY: Week 5 Sigma: successful sign-in with axios/node-fetch User-Agent
+
+==================== PHASE: Persistence ====================
+[05] T1098.005   Account Manipulation: Device Registration
+     procedure : Register a new MFA method / device so access survives a password reset.
+     result    : [emulate] registered attacker authenticator app / device (PRT)
+     DETECTED BY: Week 5 hunt H1 + Sigma correlation (non-browser sign-in -> new MFA within 60 min)
+
+==================== PHASE: Discovery / Collection ====================
+[06] T1087.004   Account Discovery: Cloud Account
+     procedure : Enumerate the tenant with a burst of Microsoft Graph calls (roles, users, contacts).
+     result    : [emulate] 42 Graph calls to 12 endpoints in 36s (recon)
+     DETECTED BY: Week 5 hunt H3: Graph reconnaissance burst (>=20 calls, >=8 endpoints in 60s)
+
+[07] T1114.002   Email Collection: Remote Email Collection
+     procedure : Read and collect the victim's mailbox and contact list for the next wave.
+     result    : [emulate] read mailbox + dumped 1000 contacts
+     DETECTED BY: Mailbox audit logs; concurrent-session CAR analytic (Week 7)
+
+==================== PHASE: Defense Evasion ====================
+[08] T1564.008   Email Hiding Rules
+     procedure : Create an inbox rule that deletes/hides finance mail to hide the fraud.
+     result    : [emulate] created inbox rule: delete invoice,payroll -> hidden
+     DETECTED BY: Week 5 hunt H2: delete/hide inbox rule after a risky sign-in
+
+==================== PHASE: Exfiltration ====================
+[09] T1567       Exfiltration Over Web Service
+     procedure : Send the stolen cookie and data out over a web service (Telegram bot).
+     result    : [emulate] exfiltrated dummy data to attacker channel (simulated Telegram)
+     DETECTED BY: Block Telegram API egress; relay-IP IOCs; CAR concurrent-session analytic
+
+# 9 steps emulated across 5 phases.
+# 8/9 steps map to a detection we built in Weeks 3, 5 and 7.

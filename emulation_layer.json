@@ -1,0 +1,95 @@
+{
+  "name": "Tycoon2FA - Week 8 emulation plan",
+  "versions": {
+    "navigator": "5.3.2",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Techniques in our Week 8 adversary emulation plan (initial access -> persistence -> exfiltration).",
+  "techniques": [
+    {
+      "techniqueID": "T1566.002",
+      "tactic": "initial-access",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 1 (Initial Access): Phishing: Spearphishing Link"
+    },
+    {
+      "techniqueID": "T1557",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 2 (Initial Access): Adversary-in-the-Middle"
+    },
+    {
+      "techniqueID": "T1111",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 3 (Initial Access): Multi-Factor Authentication Interception"
+    },
+    {
+      "techniqueID": "T1539",
+      "tactic": "credential-access",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 4 (Initial Access): Steal Web Session Cookie"
+    },
+    {
+      "techniqueID": "T1098.005",
+      "tactic": "persistence",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 5 (Persistence): Account Manipulation: Device Registration"
+    },
+    {
+      "techniqueID": "T1087.004",
+      "tactic": "discovery",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 6 (Discovery / Collection): Account Discovery: Cloud Account"
+    },
+    {
+      "techniqueID": "T1114.002",
+      "tactic": "collection",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 7 (Discovery / Collection): Email Collection: Remote Email Collection"
+    },
+    {
+      "techniqueID": "T1564.008",
+      "tactic": "defense-evasion",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 8 (Defense Evasion): Email Hiding Rules"
+    },
+    {
+      "techniqueID": "T1567",
+      "tactic": "exfiltration",
+      "score": 1,
+      "color": "#8e44ad",
+      "enabled": true,
+      "comment": "Step 9 (Exfiltration): Exfiltration Over Web Service"
+    }
+  ],
+  "legendItems": [
+    {
+      "label": "In the emulation plan",
+      "color": "#8e44ad"
+    }
+  ],
+  "layout": {
+    "layout": "side",
+    "showID": true,
+    "showName": true
+  },
+  "hideDisabled": false
+}

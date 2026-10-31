@@ -1,0 +1,70 @@
+{
+  "name": "Tycoon2FA adversary emulation plan",
+  "group": "CS-2426",
+  "description": "A simple, SAFE adversary emulation plan for Tycoon2FA, ordered initial access -> persistence -> data exfiltration, mapped to MITRE ATT&CK and written in the MITRE CALDERA profile style. Every step is a harmless placeholder (a logged echo), not a real attack command. The plan doubles as a test of our own detections (Weeks 3, 5, 7).",
+  "steps": [
+    {
+      "order": 1, "phase": "Initial Access", "tactic": "initial-access",
+      "attack_id": "T1566.002", "attack_name": "Phishing: Spearphishing Link",
+      "procedure": "Send a lure email with a link / QR code / SVG that points to the AiTM proxy.",
+      "safe_command": "echo '[emulate] sent lure email with link to AiTM proxy (no real email sent)'",
+      "our_detection": "E-mail gateway + Week 2-3 URL/domain IOCs; YARA on HTML/SVG attachments"
+    },
+    {
+      "order": 2, "phase": "Initial Access", "tactic": "credential-access",
+      "attack_id": "T1557", "attack_name": "Adversary-in-the-Middle",
+      "procedure": "Reverse proxy relays the victim's login to the real identity provider in real time.",
+      "safe_command": "python3 attack_sim/aitm_lab.py  # the Week 6 safe localhost lab",
+      "our_detection": "Week 6 simulation reproduces it; relay IP IOCs; Shodan fingerprint pivot"
+    },
+    {
+      "order": 3, "phase": "Initial Access", "tactic": "credential-access",
+      "attack_id": "T1111", "attack_name": "Multi-Factor Authentication Interception",
+      "procedure": "Capture the live one-time MFA code as it passes through the proxy.",
+      "safe_command": "echo '[emulate] captured fake MFA code 314159 in transit'",
+      "our_detection": "Inferred from the result: successful sign-in from attacker infra (Week 5 H1)"
+    },
+    {
+      "order": 4, "phase": "Initial Access", "tactic": "credential-access",
+      "attack_id": "T1539", "attack_name": "Steal Web Session Cookie",
+      "procedure": "Steal the authenticated session cookie issued after MFA succeeds.",
+      "safe_command": "echo '[emulate] stole dummy session cookie ACME-SESSION-xxxx'",
+      "our_detection": "Week 5 Sigma: successful sign-in with axios/node-fetch User-Agent"
+    },
+    {
+      "order": 5, "phase": "Persistence", "tactic": "persistence",
+      "attack_id": "T1098.005", "attack_name": "Account Manipulation: Device Registration",
+      "procedure": "Register a new MFA method / device so access survives a password reset.",
+      "safe_command": "echo '[emulate] registered attacker authenticator app / device (PRT)'",
+      "our_detection": "Week 5 hunt H1 + Sigma correlation (non-browser sign-in -> new MFA within 60 min)"
+    },
+    {
+      "order": 6, "phase": "Discovery / Collection", "tactic": "discovery",
+      "attack_id": "T1087.004", "attack_name": "Account Discovery: Cloud Account",
+      "procedure": "Enumerate the tenant with a burst of Microsoft Graph calls (roles, users, contacts).",
+      "safe_command": "echo '[emulate] 42 Graph calls to 12 endpoints in 36s (recon)'",
+      "our_detection": "Week 5 hunt H3: Graph reconnaissance burst (>=20 calls, >=8 endpoints in 60s)"
+    },
+    {
+      "order": 7, "phase": "Discovery / Collection", "tactic": "collection",
+      "attack_id": "T1114.002", "attack_name": "Email Collection: Remote Email Collection",
+      "procedure": "Read and collect the victim's mailbox and contact list for the next wave.",
+      "safe_command": "echo '[emulate] read mailbox + dumped 1000 contacts'",
+      "our_detection": "Mailbox audit logs; concurrent-session CAR analytic (Week 7)"
+    },
+    {
+      "order": 8, "phase": "Defense Evasion", "tactic": "defense-evasion",
+      "attack_id": "T1564.008", "attack_name": "Email Hiding Rules",
+      "procedure": "Create an inbox rule that deletes/hides finance mail to hide the fraud.",
+      "safe_command": "echo '[emulate] created inbox rule: delete invoice,payroll -> hidden'",
+      "our_detection": "Week 5 hunt H2: delete/hide inbox rule after a risky sign-in"
+    },
+    {
+      "order": 9, "phase": "Exfiltration", "tactic": "exfiltration",
+      "attack_id": "T1567", "attack_name": "Exfiltration Over Web Service",
+      "procedure": "Send the stolen cookie and data out over a web service (Telegram bot).",
+      "safe_command": "echo '[emulate] exfiltrated dummy data to attacker channel (simulated Telegram)'",
+      "our_detection": "Block Telegram API egress; relay-IP IOCs; CAR concurrent-session analytic"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+- id: b4d41172-0495-5f6e-8f59-63697d763a36
+  name: "04 Steal Web Session Cookie"
+  description: "Steal the authenticated session cookie issued after MFA succeeds."
+  tactic: credential-access
+  technique:
+    attack_id: T1539
+    name: "Steal Web Session Cookie"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] stole dummy session cookie ACME-SESSION-xxxx'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] stole dummy session cookie ACME-SESSION-xxxx'

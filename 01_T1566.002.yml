@@ -1,0 +1,16 @@
+- id: 6e59ba6f-126d-5489-a7b2-cf76b71077d0
+  name: "01 Phishing: Spearphishing Link"
+  description: "Send a lure email with a link / QR code / SVG that points to the AiTM proxy."
+  tactic: initial-access
+  technique:
+    attack_id: T1566.002
+    name: "Phishing: Spearphishing Link"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] sent lure email with link to AiTM proxy (no real email sent)'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] sent lure email with link to AiTM proxy (no real email sent)'

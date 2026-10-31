@@ -1,0 +1,16 @@
+- id: 20a47eff-8767-5e83-844c-c25747b5de68
+  name: "07 Email Collection: Remote Email Collection"
+  description: "Read and collect the victim's mailbox and contact list for the next wave."
+  tactic: collection
+  technique:
+    attack_id: T1114.002
+    name: "Email Collection: Remote Email Collection"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] read mailbox + dumped 1000 contacts'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] read mailbox + dumped 1000 contacts'

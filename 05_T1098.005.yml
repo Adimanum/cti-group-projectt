@@ -1,0 +1,16 @@
+- id: 4416cc4e-ff29-5481-a135-88f4779bf15d
+  name: "05 Account Manipulation: Device Registration"
+  description: "Register a new MFA method / device so access survives a password reset."
+  tactic: persistence
+  technique:
+    attack_id: T1098.005
+    name: "Account Manipulation: Device Registration"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] registered attacker authenticator app / device (PRT)'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] registered attacker authenticator app / device (PRT)'

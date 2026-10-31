@@ -1,0 +1,16 @@
+- id: 3e0c10fb-cea5-5d82-9158-876350ebfcc6
+  name: "02 Adversary-in-the-Middle"
+  description: "Reverse proxy relays the victim's login to the real identity provider in real time."
+  tactic: credential-access
+  technique:
+    attack_id: T1557
+    name: "Adversary-in-the-Middle"
+  platforms:
+    linux:
+      sh:
+        command: |
+          python3 attack_sim/aitm_lab.py  # the Week 6 safe localhost lab
+    darwin:
+      sh:
+        command: |
+          python3 attack_sim/aitm_lab.py  # the Week 6 safe localhost lab

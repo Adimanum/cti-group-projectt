@@ -1,0 +1,16 @@
+- id: 42487f7f-f600-536e-893c-57e4c4337ff6
+  name: "03 Multi-Factor Authentication Interception"
+  description: "Capture the live one-time MFA code as it passes through the proxy."
+  tactic: credential-access
+  technique:
+    attack_id: T1111
+    name: "Multi-Factor Authentication Interception"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] captured fake MFA code 314159 in transit'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] captured fake MFA code 314159 in transit'

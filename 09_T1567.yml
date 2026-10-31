@@ -1,0 +1,16 @@
+- id: 3ee611d1-0658-5b89-bc4f-cabd8affcc56
+  name: "09 Exfiltration Over Web Service"
+  description: "Send the stolen cookie and data out over a web service (Telegram bot)."
+  tactic: exfiltration
+  technique:
+    attack_id: T1567
+    name: "Exfiltration Over Web Service"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] exfiltrated dummy data to attacker channel (simulated Telegram)'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] exfiltrated dummy data to attacker channel (simulated Telegram)'

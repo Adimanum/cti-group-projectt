@@ -1,0 +1,16 @@
+- id: 993239fa-57a5-5ff1-b615-1c6411f36c08
+  name: "08 Email Hiding Rules"
+  description: "Create an inbox rule that deletes/hides finance mail to hide the fraud."
+  tactic: defense-evasion
+  technique:
+    attack_id: T1564.008
+    name: "Email Hiding Rules"
+  platforms:
+    linux:
+      sh:
+        command: |
+          echo '[emulate] created inbox rule: delete invoice,payroll -> hidden'
+    darwin:
+      sh:
+        command: |
+          echo '[emulate] created inbox rule: delete invoice,payroll -> hidden'
