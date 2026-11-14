@@ -1,0 +1,63 @@
+// Week 9 - analysing the recorded Atomic Red Team results in a SIEM
+// Upload atomic/atomic_siem_events.ndjson to Elastic (Kibana -> "Upload a file"), index: atomic-tycoon2fa
+// Set the time picker to Mar 20, 2026. Run one query at a time. SPL equivalents are at the bottom.
+//
+// These are the SAME detections we built in Week 5, now pointed at the atomic-test events, to prove
+// per technique whether each atomic test is caught. (ES|QL notes from Week 5 still apply:
+// user_agent is text -> TO_STRING(); "first"/"last" are reserved -> first_call/last_call.)
+
+// ---------- A1  T1550.004 session-cookie replay: non-browser UA sign-in ----------
+FROM atomic-tycoon2fa
+| EVAL ua = TO_STRING(user_agent)
+| WHERE log_type == "signin" AND result == "success"
+    AND (ua LIKE "axios/*" OR ua LIKE "node-fetch*" OR ua LIKE "undici*" OR ua LIKE "python-requests*")
+| KEEP @timestamp, user, src_ip, ua
+
+// ---------- A2  T1098.005 device registration: scripted sign-in -> Register device <= 60 min ----------
+FROM atomic-tycoon2fa
+| EVAL ua = TO_STRING(user_agent)
+| WHERE (log_type == "signin" AND result == "success" AND ua LIKE "axios/*")
+     OR (log_type == "audit" AND operation IN ("Register device", "User registered security info"))
+| EVAL s = CASE(log_type == "signin", @timestamp), r = CASE(log_type == "audit", @timestamp)
+| STATS odd_signin = MIN(s), registered = MAX(r) BY user
+| WHERE odd_signin IS NOT NULL AND registered IS NOT NULL
+| EVAL minutes_after = DATE_DIFF("minute", odd_signin, registered)
+| WHERE minutes_after >= 0 AND minutes_after <= 60
+
+// ---------- A3  T1564.008 email hiding rule: external-ASN sign-in -> delete/hide rule <= 120 min ----------
+FROM atomic-tycoon2fa
+| WHERE (log_type == "signin" AND result == "success" AND TO_STRING(asn) NOT IN ("64500", "64501"))
+     OR (log_type == "mailbox" AND operation == "New-InboxRule"
+         AND (details LIKE "*DeleteMessage=True*" OR details LIKE "*MarkAsRead=True*"))
+| EVAL s = CASE(log_type == "signin", @timestamp), r = CASE(log_type == "mailbox", @timestamp)
+| STATS risky_signin = MIN(s), rule_created = MAX(r) BY user
+| WHERE risky_signin IS NOT NULL AND rule_created IS NOT NULL
+| EVAL minutes_after = DATE_DIFF("minute", risky_signin, rule_created)
+| WHERE minutes_after >= 0 AND minutes_after <= 120
+
+// ---------- A4  T1087.004 Graph recon burst: >= 20 calls, >= 8 endpoints, <= 60 s ----------
+FROM atomic-tycoon2fa
+| WHERE log_type == "graph"
+| STATS calls = COUNT(*), endpoints = COUNT_DISTINCT(request_uri),
+        first_call = MIN(@timestamp), last_call = MAX(@timestamp) BY session_id, user
+| EVAL seconds = DATE_DIFF("second", first_call, last_call)
+| WHERE calls >= 20 AND seconds <= 60 AND endpoints >= 8
+
+// ---------- A5  endpoint tests NOT covered by our cloud SIEM (expected empty) ----------
+// T1059.001 / T1003.001 land as log_type == "process". Our identity detections do not look at
+// process events, so this is deliberately out of scope - caught by EDR, not by us. Future work.
+FROM atomic-tycoon2fa
+| WHERE log_type == "process"
+| KEEP @timestamp, user, operation, details
+
+// ======================================================================================
+// Splunk SPL equivalents (index=atomic-tycoon2fa)
+// ======================================================================================
+// A1: index=atomic-tycoon2fa log_type=signin result=success (user_agent=axios/* OR user_agent=node-fetch*)
+//     | table _time user src_ip user_agent
+// A2: index=atomic-tycoon2fa (log_type=signin result=success user_agent=axios/*) OR (log_type=audit operation="Register device")
+//     | transaction user maxspan=60m | search log_type=signin log_type=audit
+// A3: index=atomic-tycoon2fa (log_type=signin result=success NOT asn IN (64500,64501)) OR (log_type=mailbox operation="New-InboxRule" details="*DeleteMessage=True*")
+//     | transaction user maxspan=120m | search log_type=signin log_type=mailbox
+// A4: index=atomic-tycoon2fa log_type=graph | stats count dc(request_uri) as endpoints range(_time) as secs by session_id user
+//     | where count>=20 AND endpoints>=8 AND secs<=60

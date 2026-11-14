@@ -1,0 +1,40 @@
+# Atomic Red Team run - suite: Tycoon2FA Atomic Tests  tenant: contoso.example
+# SAFE: every command is a harmless echo. No real attack is performed.
+
+[T1059.001] Command and Scripting Interpreter: PowerShell  (scope: endpoint)
+     test     : Benign PowerShell execution marker
+     executed : [atomic T1059.001] simulated PowerShell cradle: powershell -enc BASE64BLOB
+     recorded : 1 SIEM event(s) -> atomic_siem_events.ndjson
+[T1003.001] OS Credential Dumping: LSASS Memory  (scope: endpoint)
+     test     : Benign LSASS-dump marker
+     executed : [atomic T1003.001] simulated lsass minidump to C:WindowsTemplsass.dmp
+     recorded : 1 SIEM event(s) -> atomic_siem_events.ndjson
+[T1550.004] Use Alternate Authentication Material: Web Session Cookie  (scope: cloud)
+     test     : Replay stolen session cookie with a non-browser client
+     executed : [atomic T1550.004] replayed session cookie for sara.kim@contoso.example from 45.39.175.12 UA=axios/1.6.8
+     recorded : 1 SIEM event(s) -> atomic_siem_events.ndjson
+[T1098.005] Account Manipulation: Device Registration  (scope: cloud)
+     test     : Register a new MFA device after a scripted sign-in
+     executed : [atomic T1098.005] registered new MFA device for sara.kim@contoso.example
+     recorded : 2 SIEM event(s) -> atomic_siem_events.ndjson
+[T1564.008] Hide Artifacts: Email Hiding Rules  (scope: cloud)
+     test     : Create a delete/hide inbox rule for finance mail
+     executed : [atomic T1564.008] New-InboxRule hide-finance DeleteMessage=True for sara.kim@contoso.example
+     recorded : 2 SIEM event(s) -> atomic_siem_events.ndjson
+[T1087.004] Account Discovery: Cloud Account  (scope: cloud)
+     test     : Microsoft Graph reconnaissance burst
+     executed : [atomic T1087.004] 30 Graph calls across 10 endpoints in ~40s for sara.kim@contoso.example
+     recorded : 30 SIEM event(s) -> atomic_siem_events.ndjson
+
+==================== ANALYSIS (our detections over the recorded events) ====================
+  [T1059.001 ] Benign PowerShell execution marker                   -> not detected via - (out of SIEM scope: endpoint/EDR)
+  [T1003.001 ] Benign LSASS-dump marker                             -> not detected via - (out of SIEM scope: endpoint/EDR)
+  [T1550.004 ] Replay stolen session cookie with a non-browser clie -> DETECTED     via Sigma axios UA + hunt H1a
+  [T1098.005 ] Register a new MFA device after a scripted sign-in   -> DETECTED     via hunt H1
+  [T1564.008 ] Create a delete/hide inbox rule for finance mail     -> DETECTED     via hunt H2
+  [T1087.004 ] Microsoft Graph reconnaissance burst                 -> DETECTED     via hunt H3
+
+# 6 atomic tests run; 4 detected by our identity/cloud SIEM detections.
+# 2 not detected: the generic endpoint examples (T1059.001, T1003.001) -
+#   Tycoon2FA is an identity attack, so endpoint execution is outside our current SIEM scope.
+# 37 SIEM events recorded to atomic_siem_events.ndjson.

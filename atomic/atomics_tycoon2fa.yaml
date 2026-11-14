@@ -1,0 +1,131 @@
+# Atomic Red Team - style test suite for the Tycoon2FA case study (Week 9, group CS-2426)
+#
+# Format follows Red Canary's Atomic Red Team (attack_technique / display_name / atomic_tests
+# with name, description, supported_platforms, input_arguments, executor).
+#
+# SAFETY: every executor command here is a HARMLESS PLACEHOLDER (an `echo`). We do NOT reproduce
+# the real weaponised commands. For the tests that have a real public counterpart we note its
+# reference (e.g. "Atomic Red Team T1059.001 Test #1") for documentation only. Running this suite
+# with run_atomics.py performs no attack: it just prints the step and emits a SIEM event so we can
+# check whether our detections (Weeks 3/5/7) would fire. Fake tenant: contoso.example.
+#
+# `siem_event` on each test tells run_atomics.py which log record the real action would leave, so
+# the test can be "recorded and analysed in a SIEM" (the Week 9 task).
+
+suite: Tycoon2FA Atomic Tests
+tenant: contoso.example
+
+tests:
+
+  # ---- Required syllabus examples (endpoint techniques) --------------------------------------
+  - attack_technique: T1059.001
+    display_name: "Command and Scripting Interpreter: PowerShell"
+    scope: endpoint
+    real_atomic_reference: "Atomic Red Team T1059.001 (Test #1 - Mshta/PowerShell download cradle)"
+    atomic_tests:
+      - name: "Benign PowerShell execution marker"
+        description: >
+          Example atomic test required by the syllabus. On a real host this runs a PowerShell
+          download-and-execute cradle. Here it is neutralised to an echo. Our SIEM is identity/
+          cloud-focused, so this endpoint test is expected NOT to be caught by our current hunts.
+        supported_platforms: [windows]
+        input_arguments:
+          marker: {description: text to print, type: string, default: "powershell -enc BASE64BLOB"}
+        executor:
+          name: command_prompt
+          command: |
+            echo [atomic T1059.001] simulated PowerShell cradle: #{marker}
+        siem_event: {log_type: process, operation: "ProcessCreate", detected_expectation: false}
+
+  - attack_technique: T1003.001
+    display_name: "OS Credential Dumping: LSASS Memory"
+    scope: endpoint
+    real_atomic_reference: "Atomic Red Team T1003.001 (Test #1 - comsvcs.dll MiniDump of lsass)"
+    atomic_tests:
+      - name: "Benign LSASS-dump marker"
+        description: >
+          Example atomic test required by the syllabus. On a real host this dumps LSASS memory to
+          steal credentials. Here it is neutralised to an echo. Tycoon2FA is an identity/cloud
+          attack, not an endpoint one, so this is expected NOT to be caught by our cloud SIEM -
+          an honest coverage gap we report.
+        supported_platforms: [windows]
+        executor:
+          name: command_prompt
+          command: |
+            echo [atomic T1003.001] simulated lsass minidump to C:\Windows\Temp\lsass.dmp
+        siem_event: {log_type: process, operation: "ProcessCreate", detected_expectation: false}
+
+  # ---- Tycoon2FA cloud / identity chain (our own techniques) --------------------------------
+  - attack_technique: T1550.004
+    display_name: "Use Alternate Authentication Material: Web Session Cookie"
+    scope: cloud
+    atomic_tests:
+      - name: "Replay stolen session cookie with a non-browser client"
+        description: >
+          Simulates an attacker replaying a stolen Microsoft 365 session cookie using a scripted
+          HTTP client (axios), which is how Tycoon2FA session replay looks in sign-in logs.
+        supported_platforms: [azure-ad]
+        input_arguments:
+          user: {description: victim UPN, type: string, default: "sara.kim@contoso.example"}
+          user_agent: {description: client UA, type: string, default: "axios/1.6.8"}
+          src_ip: {description: attacker IP, type: string, default: "45.39.175.12"}
+        executor:
+          name: manual
+          command: |
+            echo [atomic T1550.004] replayed session cookie for #{user} from #{src_ip} UA=#{user_agent}
+        siem_event: {log_type: signin, operation: "Sign-in activity", result: success,
+                     detected_expectation: true}
+
+  - attack_technique: T1098.005
+    display_name: "Account Manipulation: Device Registration"
+    scope: cloud
+    atomic_tests:
+      - name: "Register a new MFA device after a scripted sign-in"
+        description: >
+          Simulates Tycoon2FA persistence: a non-browser sign-in followed within the hour by
+          registering a new authenticator/device, so access survives a password reset.
+        supported_platforms: [azure-ad]
+        input_arguments:
+          user: {description: victim UPN, type: string, default: "sara.kim@contoso.example"}
+        executor:
+          name: manual
+          command: |
+            echo [atomic T1098.005] registered new MFA device for #{user}
+        siem_event: {log_type: audit, operation: "Register device", detected_expectation: true}
+
+  - attack_technique: T1564.008
+    display_name: "Hide Artifacts: Email Hiding Rules"
+    scope: cloud
+    atomic_tests:
+      - name: "Create a delete/hide inbox rule for finance mail"
+        description: >
+          Simulates the attacker hiding fraud: an inbox rule that deletes or marks-read mail about
+          invoices/payroll, created shortly after a sign-in from an unknown ASN.
+        supported_platforms: [office-365]
+        input_arguments:
+          user: {description: victim UPN, type: string, default: "sara.kim@contoso.example"}
+        executor:
+          name: manual
+          command: |
+            echo [atomic T1564.008] New-InboxRule 'hide-finance' DeleteMessage=True for #{user}
+        siem_event: {log_type: mailbox, operation: "New-InboxRule",
+                     details: "Name=hide-finance;DeleteMessage=True;SubjectContains=invoice,payroll",
+                     detected_expectation: true}
+
+  - attack_technique: T1087.004
+    display_name: "Account Discovery: Cloud Account"
+    scope: cloud
+    atomic_tests:
+      - name: "Microsoft Graph reconnaissance burst"
+        description: >
+          Simulates post-compromise recon: a burst of Microsoft Graph calls to many endpoints in a
+          few seconds (users, roles, groups, contacts), as seen after a Tycoon2FA takeover.
+        supported_platforms: [azure-ad]
+        input_arguments:
+          user: {description: victim UPN, type: string, default: "sara.kim@contoso.example"}
+          calls: {description: number of Graph calls, type: integer, default: 30}
+        executor:
+          name: manual
+          command: |
+            echo [atomic T1087.004] #{calls} Graph calls across 10 endpoints in ~40s for #{user}
+        siem_event: {log_type: graph, operation: "GET", burst: true, detected_expectation: true}

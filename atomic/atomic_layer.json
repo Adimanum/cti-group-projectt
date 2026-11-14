@@ -1,0 +1,76 @@
+{
+  "name": "Tycoon2FA - Week 9 Atomic Red Team results",
+  "versions": {
+    "navigator": "5.3.2",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Atomic tests we ran; blue = caught by our detections, grey = out of our SIEM scope.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.001",
+      "score": 0,
+      "color": "#9aa0a6",
+      "enabled": true,
+      "comment": "tested, out of SIEM scope (endpoint/EDR)"
+    },
+    {
+      "techniqueID": "T1003.001",
+      "score": 0,
+      "color": "#9aa0a6",
+      "enabled": true,
+      "comment": "tested, out of SIEM scope (endpoint/EDR)"
+    },
+    {
+      "techniqueID": "T1550.004",
+      "score": 1,
+      "color": "#2a6fb0",
+      "enabled": true,
+      "comment": "DETECTED by Sigma axios UA + hunt H1a"
+    },
+    {
+      "techniqueID": "T1098.005",
+      "score": 1,
+      "color": "#2a6fb0",
+      "enabled": true,
+      "comment": "DETECTED by hunt H1"
+    },
+    {
+      "techniqueID": "T1564.008",
+      "score": 1,
+      "color": "#2a6fb0",
+      "enabled": true,
+      "comment": "DETECTED by hunt H2"
+    },
+    {
+      "techniqueID": "T1087.004",
+      "score": 1,
+      "color": "#2a6fb0",
+      "enabled": true,
+      "comment": "DETECTED by hunt H3"
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#9aa0a6",
+      "#2a6fb0"
+    ],
+    "minValue": 0,
+    "maxValue": 1
+  },
+  "legendItems": [
+    {
+      "label": "Detected by our SIEM",
+      "color": "#2a6fb0"
+    },
+    {
+      "label": "Tested, not detected (endpoint/EDR)",
+      "color": "#9aa0a6"
+    }
+  ],
+  "layout": {
+    "layout": "side",
+    "showID": true,
+    "showName": true
+  }
+}
