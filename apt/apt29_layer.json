@@ -1,0 +1,159 @@
+{
+  "name": "APT29 TTPs vs Tycoon2FA (Week 10)",
+  "versions": {
+    "navigator": "5.3.2",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "APT29 techniques. Dark blue = also used by Tycoon2FA and covered by our detections; light blue = related to our coverage; grey = APT29-only, beyond a PhaaS kit.",
+  "techniques": [
+    {
+      "techniqueID": "T1566.002",
+      "tactic": "initial-access",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: E-mail IOCs + YARA (Week 3)"
+    },
+    {
+      "techniqueID": "T1566.001",
+      "tactic": "initial-access",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - attachment sandboxing (future work)"
+    },
+    {
+      "techniqueID": "T1621",
+      "tactic": "credential-access",
+      "enabled": true,
+      "color": "#8fb4d8",
+      "score": 1,
+      "comment": "related: related to our T1111 coverage; many-prompts pattern = new hunt idea"
+    },
+    {
+      "techniqueID": "T1539",
+      "tactic": "credential-access",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: Sigma axios UA + hunt H1a (Week 5)"
+    },
+    {
+      "techniqueID": "T1606.001",
+      "tactic": "credential-access",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - AD FS / token-signing-cert monitoring (future work)"
+    },
+    {
+      "techniqueID": "T1550.004",
+      "tactic": "defense-evasion",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: Sigma axios UA (Week 5) + CAR concurrent-session (Week 7)"
+    },
+    {
+      "techniqueID": "T1550.001",
+      "tactic": "defense-evasion",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - OAuth token / app monitoring (future work)"
+    },
+    {
+      "techniqueID": "T1098.005",
+      "tactic": "persistence",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: hunt H1 + Sigma correlation (Week 5)"
+    },
+    {
+      "techniqueID": "T1098.001",
+      "tactic": "persistence",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - service-principal credential-add auditing (future work)"
+    },
+    {
+      "techniqueID": "T1098.002",
+      "tactic": "persistence",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - mailbox delegation auditing (future work)"
+    },
+    {
+      "techniqueID": "T1098.003",
+      "tactic": "persistence",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - privileged-role-change auditing (future work)"
+    },
+    {
+      "techniqueID": "T1087.004",
+      "tactic": "discovery",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: hunt H3 Graph recon burst (Week 5)"
+    },
+    {
+      "techniqueID": "T1114.002",
+      "tactic": "collection",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: mailbox audit + CAR concurrent-session (Week 7)"
+    },
+    {
+      "techniqueID": "T1078.004",
+      "tactic": "initial-access",
+      "enabled": true,
+      "color": "#2a6fb0",
+      "score": 2,
+      "comment": "shared: hunt H0 IOC sweep + CAR analytic (Weeks 5, 7)"
+    },
+    {
+      "techniqueID": "T1195.002",
+      "tactic": "initial-access",
+      "enabled": true,
+      "color": "#c9ccd0",
+      "score": 0,
+      "comment": "apt29_only: not covered - nation-state capability beyond a PhaaS kit"
+    },
+    {
+      "techniqueID": "T1048.002",
+      "tactic": "exfiltration",
+      "enabled": true,
+      "color": "#8fb4d8",
+      "score": 1,
+      "comment": "related: related to our T1567 egress controls (Week 8)"
+    }
+  ],
+  "legendItems": [
+    {
+      "label": "Shared with Tycoon2FA (we detect)",
+      "color": "#2a6fb0"
+    },
+    {
+      "label": "Related to our coverage",
+      "color": "#8fb4d8"
+    },
+    {
+      "label": "APT29-only (gap / future work)",
+      "color": "#c9ccd0"
+    }
+  ],
+  "layout": {
+    "layout": "side",
+    "showID": true,
+    "showName": true
+  },
+  "hideDisabled": false
+}

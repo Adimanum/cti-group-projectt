@@ -1,0 +1,17 @@
+tactic,attack_id,technique,apt29_use,overlap_tycoon2fa,our_detection
+initial-access,T1566.002,Phishing: Spearphishing Link,Spearphishing links to zip/HTML payloads; 2023-2024 campaigns used Microsoft Teams and device-code phishing lures.,shared,E-mail IOCs + YARA (Week 3)
+initial-access,T1566.001,Phishing: Spearphishing Attachment,"Malicious attachments (e.g. LNK, ISO, exploit docs) to initial victims.",apt29_only,not covered - attachment sandboxing (future work)
+credential-access,T1621,Multi-Factor Authentication Request Generation,MFA 'push bombing' - repeated prompts until the victim approves one.,related,related to our T1111 coverage; many-prompts pattern = new hunt idea
+credential-access,T1539,Steal Web Session Cookie,Stole session cookies/tokens to access mailboxes without a password.,shared,Sigma axios UA + hunt H1a (Week 5)
+credential-access,T1606.001,Forge Web Credentials: Web Cookies,Forged SAML tokens ('Golden SAML') and OWA cookies from a stolen signing key to bypass MFA.,apt29_only,not covered - AD FS / token-signing-cert monitoring (future work)
+defense-evasion,T1550.004,Use Alternate Auth Material: Web Session Cookie,Reused stolen session cookies to authenticate as the victim.,shared,Sigma axios UA (Week 5) + CAR concurrent-session (Week 7)
+defense-evasion,T1550.001,Use Alternate Auth Material: Application Access Token,Used OAuth application access tokens to reach cloud resources and mail.,apt29_only,not covered - OAuth token / app monitoring (future work)
+persistence,T1098.005,Account Manipulation: Device Registration,Enrolled attacker-controlled devices in compromised tenants for mailbox sync and durable access.,shared,hunt H1 + Sigma correlation (Week 5)
+persistence,T1098.001,Account Manipulation: Additional Cloud Credentials,Added credentials/secrets to existing OAuth apps and service principals.,apt29_only,not covered - service-principal credential-add auditing (future work)
+persistence,T1098.002,Account Manipulation: Additional Email Delegate Permissions,Granted themselves delegated mailbox permissions to read others' mail.,apt29_only,not covered - mailbox delegation auditing (future work)
+persistence,T1098.003,Account Manipulation: Additional Cloud Roles,Assigned admin roles (e.g. Global Admin) to accounts/service principals they controlled.,apt29_only,not covered - privileged-role-change auditing (future work)
+discovery,T1087.004,Account Discovery: Cloud Account,Enumerated Azure AD / Entra ID accounts and directory objects.,shared,hunt H3 Graph recon burst (Week 5)
+collection,T1114.002,Email Collection: Remote Email Collection,Collected email from mailboxes in Azure AD tenants and Exchange (incl. the 2024 Microsoft corporate-mailbox breach).,shared,mailbox audit + CAR concurrent-session (Week 7)
+initial-access,T1078.004,Valid Accounts: Cloud Accounts,"Logged in with stolen valid cloud credentials/tokens, blending into normal traffic.",shared,"hunt H0 IOC sweep + CAR analytic (Weeks 5, 7)"
+initial-access,T1195.002,Supply Chain Compromise: Software Supply Chain,SolarWinds Orion compromise (2020) - trojanised updates to thousands of organisations.,apt29_only,not covered - nation-state capability beyond a PhaaS kit
+exfiltration,T1048.002,Exfiltration Over Asymmetric Encrypted Non-C2 Protocol,Exfiltrated password-protected archives over HTTPS to attacker infrastructure.,related,related to our T1567 egress controls (Week 8)
